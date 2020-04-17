@@ -6,6 +6,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.excel.RowMapper;
 import org.springframework.batch.item.excel.mapping.BeanWrapperRowMapper;
@@ -17,6 +18,8 @@ import org.springframework.core.io.ClassPathResource;
 
 import com.aims.bo.Employee;
 import com.aims.listener.JobCompletionListener;
+import com.aims.model.HCIntermediate;
+import com.aims.processor.ProcessorConvertToJson;
 import com.aims.step.Processor;
 import com.aims.step.Reader;
 import com.aims.step.Writer;
@@ -50,7 +53,10 @@ public class BatchConfig {
 	 .flow(orderStep1()).end().build(); }
 	 
 	 @Bean public Step orderStep1() { return
-	 stepBuilderFactory.get("orderStep1").<Employee, Employee> chunk(1) .reader(excelStudentReader()).processor(new Processor()) .writer(new Writer()).build(); }
+	 stepBuilderFactory.get("orderStep1").<Employee, HCIntermediate> chunk(1) .reader(excelStudentReader())
+	 .processor(processor())
+//	 .writer(new Writer())
+	 .build(); }
 	 
 	 @Bean public JobExecutionListener listener() { return new
 			 JobCompletionListener(); }
@@ -65,8 +71,13 @@ public class BatchConfig {
 	    }
 	 
 	    private RowMapper<Employee> excelRowMapper() {
-	        
-	        return new EmployeeRowMapper();
+	    	 BeanWrapperRowMapper<Employee> rowMapper = new BeanWrapperRowMapper<>();
+	         rowMapper.setTargetType(Employee.class);
+	        return rowMapper;
+	    }
+	    @Bean
+	    public ItemProcessor<Employee, HCIntermediate> processor() {
+	        return new ProcessorConvertToJson();
 	    }
 
 }
