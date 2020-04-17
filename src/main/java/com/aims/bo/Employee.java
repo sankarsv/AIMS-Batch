@@ -1,5 +1,6 @@
 package com.aims.bo;
 
+import java.util.Date;
 
 public class Employee {
 	
@@ -15,10 +16,20 @@ public class Employee {
 	
 	private String clientGeography;
 	
+	private String clientCountry;
+	
 	private String IP;
 	 
 	private String SP;
 	
+	public String getClientCountry() {
+		return clientCountry;
+	}
+
+	public void setClientCountry(String clientCountry) {
+		this.clientCountry = clientCountry;
+	}
+
 	private String subSP;
 	
 	private String customer;

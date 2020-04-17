@@ -71,9 +71,8 @@ public class BatchConfig {
 	    }
 	 
 	    private RowMapper<Employee> excelRowMapper() {
-	    	 BeanWrapperRowMapper<Employee> rowMapper = new BeanWrapperRowMapper<>();
-	         rowMapper.setTargetType(Employee.class);
-	        return rowMapper;
+	    	 
+	        return new EmployeeRowMapper();
 	    }
 	    @Bean
 	    public ItemProcessor<Employee, HCIntermediate> processor() {
