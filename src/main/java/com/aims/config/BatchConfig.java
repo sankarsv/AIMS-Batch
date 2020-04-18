@@ -20,8 +20,12 @@ import org.springframework.core.io.ClassPathResource;
 
 import com.aims.bo.Employee;
 import com.aims.listener.JobCompletionListener;
+import com.aims.mapper.EmployeeRowMapper;
 import com.aims.model.HCIntermediate;
+import com.aims.model.HCVersion;
+import com.aims.processor.ProcessSetVersionValues;
 import com.aims.processor.ProcessorConvertToJson;
+import com.aims.step.Reader;
 
 @Configuration
 public class BatchConfig {
@@ -53,7 +57,7 @@ public class BatchConfig {
 	
 	 @Bean public Job processJob() { return jobBuilderFactory.get("processJob")
 	 .incrementer(new RunIdIncrementer()).listener(listener())
-	 .flow(orderStep1()).end().build(); }
+	 .flow(orderStep1()).next(orderStep2()).end().build(); }
 	 
 	 @Bean public Step orderStep1() { return
 	 stepBuilderFactory.get("orderStep1").<Employee, HCIntermediate> chunk(1) .reader(excelStudentReader())
@@ -61,27 +65,57 @@ public class BatchConfig {
 	 .writer(writer())
 	 .build(); }
 	 
+	 @Bean public Step orderStep2() { return
+			 stepBuilderFactory.get("orderStep2").<String, HCVersion> chunk(2).reader(hcVersionReader())
+			 .processor(processor2())
+			 .writer(writer2())
+			 .build(); }
+	 
 	 @Bean public JobExecutionListener listener() { return new
 			 JobCompletionListener(); }
 	 @Bean
 	    ItemReader<Employee> excelStudentReader() {
 	        PoiItemReader<Employee> reader = new PoiItemReader<Employee>();
 	        System.out.println("Entered configuration");
-//	        reader.setUseDataFormatter(true);
+	        reader.setUseDataFormatter(true);
 	        reader.setLinesToSkip(16);
 	        reader.setResource(new ClassPathResource("MasterFeed.xls"));
 	        reader.setRowMapper(excelRowMapper());
 	        return reader;
 	    }
-	 
+	
+	 @Bean
+	    ItemReader<String> hcVersionReader() {        
+	        System.out.println("Entered hc version reader");
+	        return new Reader();
+	    }
+	
+	/* @Bean
+	    ItemReader<String> readDescription() {
+	        PoiItemReader<String> reader = new PoiItemReader<String>();
+	        System.out.println("Entered configuration");
+//	        reader.setUseDataFormatter(true);
+	        reader.setResource(new ClassPathResource("MasterFeed.xls"));
+	        reader.setRowMapper(descriptionRowMapper());
+	        return reader;
+	    }
+	*/ 
 	    private RowMapper<Employee> excelRowMapper() {
 	    	 
 	        return new EmployeeRowMapper();
 	    }
+	    
+	   
 	    @Bean
 	    public ItemProcessor<Employee, HCIntermediate> processor() {
 	        return new ProcessorConvertToJson();
 	    }
+	    
+	    @Bean
+	    public ItemProcessor<String, HCVersion> processor2() {
+	        return new ProcessSetVersionValues();
+	    }
+
 	    
 	    
 	    @Bean
@@ -90,5 +124,13 @@ public class BatchConfig {
 	        writer.setEntityManagerFactory(emf);
 	        return writer;
 	    }
+	    
+	    @Bean
+	    public JpaItemWriter<HCVersion> writer2() {
+	        JpaItemWriter writer = new JpaItemWriter();
+	        writer.setEntityManagerFactory(emf);
+	        return writer;
+	    }
+
 
 }

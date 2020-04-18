@@ -1,4 +1,4 @@
-package com.aims.config;
+package com.aims.mapper;
 
 import org.springframework.batch.item.excel.RowMapper;
 import org.springframework.batch.item.excel.support.rowset.RowSet;

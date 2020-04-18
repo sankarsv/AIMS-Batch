@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  *
  */
 @Entity
-@Table(name="HCINTERMEDIATE",schema="aims")
+@Table(name="hc_intermediate",schema="aims")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class HCIntermediate {
 	@Id 
