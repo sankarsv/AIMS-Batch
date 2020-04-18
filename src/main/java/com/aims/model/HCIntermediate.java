@@ -22,7 +22,7 @@ public class HCIntermediate {
 	@Column(name="EMPLOYEE_ID")
 	private int employeeId;
 	
-	@Column(name="JSON")
+	@Column(name="JSON",length = 10000)
 	private String json;
 
 	/**
