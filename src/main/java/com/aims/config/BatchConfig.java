@@ -64,6 +64,7 @@ public class BatchConfig {
 	    ItemReader<Employee> excelStudentReader() {
 	        PoiItemReader<Employee> reader = new PoiItemReader<Employee>();
 	        System.out.println("Entered configuration");
+	        reader.setUseDataFormatter(true);
 	        reader.setLinesToSkip(16);
 	        reader.setResource(new ClassPathResource("MasterFeed.xls"));
 	        reader.setRowMapper(excelRowMapper());
