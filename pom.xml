@@ -22,7 +22,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<jxl.version>2.6.12</jxl.version>
-        <poi.version>3.17</poi.version>
+        <!-- <poi.version>3.17</poi.version> -->
+         <poi.version>3.11</poi.version>
 		<java.version>1.8</java.version>
 	</properties>
 
@@ -46,10 +47,17 @@
 			<optional>true</optional>
 		</dependency>
 
+<!-- https://mvnrepository.com/artifact/javax.persistence/javax.persistence-api -->
 		<dependency>
-  			  <groupId>com.github.kumarpankaj18</groupId>
+   			 <groupId>javax.persistence</groupId>
+    		<artifactId>javax.persistence-api</artifactId>
+    		<version>2.2</version>
+		</dependency>
+
+		<dependency>
+  			  <groupId>org.springframework.batch</groupId>
    			  <artifactId>spring-batch-excel</artifactId>
-  			  <version>1.0.6 </version>
+  			  <version>0.5.0-snapshot</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -86,7 +94,12 @@
             <optional>true</optional>
         </dependency>
 		
-
+		
+		<!-- <dependency> <groupId>org.postgresql</groupId> <artifactId>postgresql</artifactId> 
+			<version>9.3-1102-jdbc41</version> </dependency> -->
+		<!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+		<!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+	
 	</dependencies>
 
 	<build>
