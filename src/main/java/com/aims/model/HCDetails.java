@@ -28,7 +28,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Entity
 @Table(name="HCMASTER",schema="aims")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class HCDetails implements Serializable {
+public class HCDetails implements Serializable
+{
 	
 	@Id 
 	@Column(name="VERSION_NO")

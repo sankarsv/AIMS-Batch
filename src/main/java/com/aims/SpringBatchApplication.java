@@ -14,5 +14,6 @@ public class SpringBatchApplication {
 
 	public static void main(String[] args) throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException {
 		SpringApplication.run(SpringBatchApplication.class, args);
+		System.exit(1);
 	}
 }

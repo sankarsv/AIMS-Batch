@@ -8,7 +8,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
@@ -24,7 +23,7 @@ public class HCIntermediate {
 	private int employeeId;
 	
 	@Column(name="JSON")
-	private char json;
+	private String json;
 
 	/**
 	 * @return the employeeId
@@ -43,14 +42,14 @@ public class HCIntermediate {
 	/**
 	 * @return the json
 	 */
-	public char getJson() {
+	public String getJson() {
 		return json;
 	}
 
 	/**
 	 * @param json the json to set
 	 */
-	public void setJson(char json) {
+	public void setJson(String json) {
 		this.json = json;
 	}
 
