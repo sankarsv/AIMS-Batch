@@ -2,6 +2,7 @@ package com.aims.processor;
 
 import org.springframework.batch.item.ItemProcessor;
 
+import com.aims.bo.Employee;
 import com.aims.model.HCVersion;
 
 public class ProcessSetVersionValues implements ItemProcessor<String, HCVersion> {
@@ -11,7 +12,7 @@ public class ProcessSetVersionValues implements ItemProcessor<String, HCVersion>
 		
 		HCVersion hcVers = new HCVersion();
 		
-		hcVers.setVersionNo(1);
+		hcVers.setVersionNo(2);
 		
 		long millis=System.currentTimeMillis();  
 		java.sql.Date date=new java.sql.Date(millis);  

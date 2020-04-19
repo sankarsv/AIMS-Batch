@@ -13,22 +13,22 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Entity
 @Table(name="hcversion",schema="aims")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class HCVersion implements Serializable{
+public class HCVersion{
 	
 	
 	@Id 
 	@Column(name="version_no")
 	private int versionNo;
 	
-	@Id 
+ 
 	@Column(name="load_date")
 	private Date load_Date;
 	
-	@Id 
+ 
 	@Column(name="description")
 	private String description;
 	
-	@Id 
+ 
 	@Column(name="current_ind")
 	private String current_ind;
 

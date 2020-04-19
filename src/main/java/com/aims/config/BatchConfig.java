@@ -66,7 +66,7 @@ public class BatchConfig {
 	 .build(); }
 	 
 	 @Bean public Step orderStep2() { return
-			 stepBuilderFactory.get("orderStep2").<String, HCVersion> chunk(2).reader(hcVersionReader())
+			 stepBuilderFactory.get("orderStep2").<String, HCVersion> chunk(1).reader(hcVersionReader())
 			 .processor(processor2())
 			 .writer(writer2())
 			 .build(); }
