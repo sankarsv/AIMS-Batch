@@ -3,10 +3,14 @@
  */
 package com.aims.model;
 
+import java.sql.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -15,44 +19,34 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  *
  */
 @Entity
-@Table(name="hc_intermediate",schema="aims")
+@Table(name="HC_INTERMEDIATE",schema="aims")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class HCIntermediate {
 	@Id 
-	@Column(name="EMPLOYEE_ID")
-	private int employeeId;
+	@Column(name="UPLOAD_TIME")
+	@NotNull
+	private Date upload_Time;
 	
-	@Column(name="JSON",length = 10000)
-	private String json;
-
-	/**
-	 * @return the employeeId
-	 */
-	public int getEmployeeId() {
-		return employeeId;
+	public Date getUpload_Time() {
+		return upload_Time;
 	}
 
-	/**
-	 * @param employeeId the employeeId to set
-	 */
-	public void setEmployeeId(int employeeId) {
-		this.employeeId = employeeId;
+	public void setUpload_Time(Date upload_Time) {
+		this.upload_Time = upload_Time;
 	}
 
-	/**
-	 * @return the json
-	 */
-	public String getJson() {
-		return json;
+	public byte[] getFiledata() {
+		return filedata;
 	}
 
-	/**
-	 * @param json the json to set
-	 */
-	public void setJson(String json) {
-		this.json = json;
+	public void setFiledata(byte[] filedata) {
+		this.filedata = filedata;
 	}
 
-	
-	
+	@Lob
+	@Column(name="FILEDATA")
+	@NotNull
+	private byte[] filedata;
+
+		
 }

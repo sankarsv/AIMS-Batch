@@ -10,12 +10,16 @@ import com.aims.bo.Employee;
 public class Reader implements ItemReader<String> {
 
 	
+	private boolean isReadComplete = false;
+	
 
 
 	@Override
 	public String read() throws Exception, UnexpectedInputException,
 			ParseException, NonTransientResourceException {
 		
-		return "Head count report";	}
+		return isReadComplete==false ? "Head Count Report": null;	
+		
+	}
 
 }

@@ -3,24 +3,10 @@
  */
 package com.aims.model;
 
-/**
- * @author HP
- *
- */
-
-import java.io.Serializable;
-import java.time.LocalDate;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -28,14 +14,15 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Entity
 @Table(name="HCMASTER",schema="aims")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class HCDetails implements Serializable
+public class HCDetails 
 {
 	
-	@Id 
+
 	@Column(name="VERSION_NO")
 	private int versionNo;
-
-	@Column(name="EMPLOYEE_ID", insertable = false, updatable = false)
+	
+	@Id 
+	@Column(name="EMPLOYEE_ID")
 	private int empNo;
 	
 	@Column(name="WORK_GEOGRAPHY")
@@ -63,6 +50,8 @@ public class HCDetails implements Serializable
 	@Column(name="SUB_SP")
 	private String subSP;
 	
+	@Column(name="EMPLOYEE_LOCATION")
+	private String employeeLocation;
 
 	@Column(name="CUSTOMER")
 	private String customer;
@@ -85,7 +74,7 @@ public class HCDetails implements Serializable
 	
 	@Column(name="AM")
 	private String am;;
-	
+	 
 	@Column(name="PROJECT_ID")
 	private String projectID;
 	
@@ -140,9 +129,6 @@ public class HCDetails implements Serializable
 
 	@Column(name="DEPUTE_DC")
 	private String deputeDC;
-	
-	@Column(name="EMPLOYEE_LOCATION")
-	private String empAllocation;
 	
 	@Column(name="BASE_COUNTRY")
 	private String baseCountry;
@@ -206,9 +192,7 @@ public class HCDetails implements Serializable
 	
 	
 	
-	@Column(name="employee_id")
-	private int employeeId;
-
+	
     @Column(name="employee_type", insertable = false, updatable = false)
     private String employeeType;
 
@@ -558,16 +542,6 @@ public class HCDetails implements Serializable
 	}
 
 
-	public String getEmpAllocation() {
-		return empAllocation;
-	}
-
-
-	public void setEmpAllocation(String empAllocation) {
-		this.empAllocation = empAllocation;
-	}
-
-
 	public String getBaseCountry() {
 		return baseCountry;
 	}
@@ -816,17 +790,16 @@ public class HCDetails implements Serializable
 	public void setSite(String site) {
 		this.site = site;
 	}
-
-
-	public int getEmployeeId() {
-		return employeeId;
+	
+	public String getEmployeeLocation()
+	{
+		return employeeLocation;
 	}
-
-
-	public void setEmployeeId(int employeeId) {
-		this.employeeId = employeeId;
+	
+	public void setEmployeeLocation(String employeeLocation)
+	{
+		this.employeeLocation= employeeLocation;
 	}
-
 
 	public String getEmployeeType() {
 		return employeeType;

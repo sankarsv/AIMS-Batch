@@ -1,7 +1,5 @@
 package com.aims.bo;
 
-import java.util.Date;
-
 public class Employee {
 	
 	private String empId;
@@ -13,13 +11,75 @@ public class Employee {
 	private String workCountry;
 	
 	private String workLocation;
-	
+	 
 	private String clientGeography;
 	
 	private String clientCountry;
 	
 	private String IP;
+	
+	private String pl;
+	
+	private String Dm;
+	
+	private String expat;
 	 
+	public String getExpat() {
+		return expat;
+	}
+
+	public void setExpat(String expat) {
+		this.expat = expat;
+	}
+
+	public String getBrmEmName() {
+		return brmEmName;
+	}
+
+	public String getPlatforms() {
+		return platforms;
+	}
+
+	public void setPlatforms(String platforms) {
+		this.platforms = platforms;
+	}
+
+	public String getDc() {
+		return dc;
+	}
+
+	public void setDc(String dc) {
+		this.dc = dc;
+	}
+
+	public String getSite() {
+		return site;
+	}
+
+	public void setSite(String site) {
+		this.site = site;
+	}
+
+	public void setBrmEmName(String brmEmName) {
+		this.brmEmName = brmEmName;
+	}
+
+	public String getDm() {
+		return Dm;
+	}
+
+	public void setDm(String dm) {
+		Dm = dm;
+	}
+
+	public String getPl() {
+		return pl;
+	}
+
+	public void setPl(String pl) {
+		this.pl = pl;
+	}
+
 	private String SP;
 	
 	public String getClientCountry() {
@@ -41,6 +101,8 @@ public class Employee {
 	private String brmNo;
 	
 	private String brmName;
+	
+	private String brmEmName;
 	
 	private String glName;
 	
@@ -96,6 +158,15 @@ public class Employee {
 	
 	private String CCNonCC;
 	
+	private String employeeType;
+	public String getEmployeeType() {
+		return employeeType;
+	}
+
+	public void setEmployeeType(String employeeType) {
+		this.employeeType = employeeType;
+	}
+
 	private String personType;
 	
 	private String subPersonType;
@@ -121,7 +192,12 @@ public class Employee {
 	private String teamRole;
 	
 	
+	private String platforms;
 	
+	
+	private String dc;
+	
+	private String site;
 	
 	 
 	
