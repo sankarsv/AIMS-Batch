@@ -13,7 +13,7 @@ public class ProcessSetFileResource implements ItemProcessor<HCIntermediate, Str
 	@Override
 	public String process(HCIntermediate hcin) throws Exception {
 
-		File file = new File("src/main/resources/Master_Feed.xlsx");
+		File file = new File("//Users//sankarsv//Master_Feed.xls");
 
 		OutputStream os = new FileOutputStream(file);
 		os.write(hcin.getFiledata());

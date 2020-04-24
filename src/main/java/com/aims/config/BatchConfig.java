@@ -1,5 +1,9 @@
 package com.aims.config;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.PushbackInputStream;
+
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
@@ -18,7 +22,7 @@ import org.springframework.batch.item.excel.poi.PoiItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 
 import com.aims.bo.Employee;
@@ -26,7 +30,7 @@ import com.aims.listener.JobCompletionListener;
 import com.aims.mapper.EmployeeRowMapper;
 import com.aims.model.HCDetails;
 import com.aims.model.HCIntermediate;
-import com.aims.model.HCVersion;
+import com.aims.model.VersionInfo;
 import com.aims.processor.ProcessSetFileResource;
 import com.aims.processor.ProcessorHCMasterBuild;
 
@@ -71,9 +75,17 @@ public class BatchConfig {
 	    ItemReader<Employee> excelStudentReader() {
 	        PoiItemReader<Employee> reader = new PoiItemReader<Employee>();
 	        System.out.println("Entered configuration");
+	        PushbackInputStream input = null;
+			try {
+				input = new PushbackInputStream(new FileInputStream("//Users//sankarsv//Master_Feed.xls"));
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	        InputStreamResource resource = new InputStreamResource(input);
 	        reader.setUseDataFormatter(true);
 	        reader.setLinesToSkip(1);
-	        reader.setResource(new ClassPathResource("Master_Feed.xlsx"));
+	        reader.setResource(resource);
 	        reader.setCurrentSheet(1);
 	        reader.setRowMapper(excelRowMapper());
 	        return reader;
@@ -114,8 +126,8 @@ public class BatchConfig {
 	    }
 	    
 	    @Bean
-	    public JpaItemWriter<HCVersion> writer2() {
-	    	JpaItemWriter<HCVersion> writer = new JpaItemWriter<>();
+	    public JpaItemWriter<VersionInfo> writer2() {
+	    	JpaItemWriter<VersionInfo> writer = new JpaItemWriter<>();
 	        writer.setEntityManagerFactory(emf);
 	    	return writer;
 	    }
