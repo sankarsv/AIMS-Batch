@@ -6,7 +6,15 @@ import org.springframework.batch.item.excel.support.rowset.RowSet;
 import com.aims.bo.Employee;
 
 public class EmployeeRowMapper implements RowMapper<Employee> {
-
+	
+	public Integer versionNo;
+	
+	public EmployeeRowMapper(Integer versionNo)
+	{
+		this.versionNo = versionNo;
+	}
+	
+	
 	
 	@Override
 	public Employee mapRow(RowSet rs) throws Exception {
@@ -20,6 +28,7 @@ public class EmployeeRowMapper implements RowMapper<Employee> {
 		emp.setWorkLocation(rs.getColumnValue(2));
 		emp.setClientGeography(rs.getColumnValue(3));
 		emp.setClientCountry(rs.getColumnValue(4));
+		emp.setVersionNo(versionNo.toString());
 		
 		emp.setIP(rs.getColumnValue(5));
 		emp.setSP(rs.getColumnValue(6));

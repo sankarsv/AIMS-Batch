@@ -3,9 +3,12 @@
  */
 package com.aims.model;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -13,11 +16,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name="HCMASTER",schema="aims")
+@IdClass(HCDetailsPk.class)
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class HCDetails 
+public class HCDetails implements Serializable
 {
 	
-
+	@Id 
 	@Column(name="VERSION_NO")
 	private int versionNo;
 	

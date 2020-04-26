@@ -28,7 +28,7 @@ public class ProcessorHCMasterBuild  implements ItemProcessor<Employee, HCDetail
 	
 	private void mapHcMaster(Employee emp,HCDetails hcd)
 	{
-		hcd.setVersionNo(1);
+		hcd.setVersionNo(Integer.parseInt(emp.getVersionNo()));
 		hcd.setEmpNo(Integer.parseInt(emp.getEmpId()));
 		hcd.setWorkGeography(emp.getWorkGeography());
 		hcd.setWorkLocation(emp.getWorkLocation());
