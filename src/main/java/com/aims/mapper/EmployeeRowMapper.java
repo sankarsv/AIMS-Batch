@@ -2,24 +2,37 @@ package com.aims.mapper;
 
 import org.springframework.batch.item.excel.RowMapper;
 import org.springframework.batch.item.excel.support.rowset.RowSet;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.aims.bo.Employee;
+import com.aims.helper.ConfigurationHelper;
 
 public class EmployeeRowMapper implements RowMapper<Employee> {
 	
 	public Integer versionNo;
 	
-	public EmployeeRowMapper(Integer versionNo)
+	private boolean isVersionSet = false;
+	
+	private JdbcTemplate jdbcTemplate = null;
+	
+	public EmployeeRowMapper(JdbcTemplate jdbcTemp)
 	{
-		this.versionNo = versionNo;
+		this.jdbcTemplate = jdbcTemp;
 	}
 	
 	
 	
 	@Override
 	public Employee mapRow(RowSet rs) throws Exception {
+		
 		if (rs == null || rs.getCurrentRow() == null || rs.getMetaData().getColumnCount()<50) {
 			return null;
+		}
+		
+		if(!isVersionSet)
+		{
+			versionNo = ConfigurationHelper.getVersionNo(jdbcTemplate);
+			isVersionSet = true;
 		}
 		Employee emp = new Employee();
 		

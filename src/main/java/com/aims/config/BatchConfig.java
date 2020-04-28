@@ -20,6 +20,9 @@ import org.springframework.batch.item.excel.poi.PoiItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -54,15 +57,21 @@ public class BatchConfig {
 	 .incrementer(new RunIdIncrementer()).listener(listener())
 	 .start(performVersionSave()).on("*").to(orderStep2()).end().build(); } 
 	 
-	 @Bean public Step orderStep2() { return
+	 @Bean("versionsave")
+	 public Step performVersionSave() { return
+			 stepBuilderFactory.get("performVersionSave").tasklet(new DbWriteTasklet(datasource)).build(); }
+	 
+	 
+	 
+	 @Bean
+	 @DependsOn("versionsave")
+	 public Step orderStep2() { return
 	 stepBuilderFactory.get("orderStep2").<Employee, HCDetails> chunk(1000) .reader(excelStudentReader())
 	 .processor(processor())
 	 .writer(writer())
 	 .build(); }
 	 
-	 @Bean public Step performVersionSave() { return
-			 stepBuilderFactory.get("performVersionSave").tasklet(new DbWriteTasklet(datasource)).build(); }
-	 
+	
 	 
 	/* @Bean
 	 public ExecutionContextPromotionListener promotionListener() {
@@ -81,8 +90,10 @@ public class BatchConfig {
 	 @Bean public JobExecutionListener listener() { return new
 			 JobCompletionListener(); }
 	 
-	 @Bean
-	    ItemReader<Employee> excelStudentReader() {		 	
+
+	 @Lazy
+	 @Bean	 
+    ItemReader<Employee> excelStudentReader() {		 	
 		 
 	        PoiItemReader<Employee> reader = new PoiItemReader<Employee>();
 	        System.out.println("Entered configuration");
@@ -98,7 +109,7 @@ public class BatchConfig {
 	        reader.setResource(resource);
 	        reader.setCurrentSheet(1);
 	       
-	        reader.setRowMapper(excelRowMapper(ConfigurationHelper.getVersionNo(jdbcTemplate)));
+	        reader.setRowMapper(excelRowMapper(jdbcTemplate));
 	        return reader;
 	    }
 	
@@ -111,13 +122,13 @@ public class BatchConfig {
 	        return databaseReader;
 	    }*/
 	
-	    private RowMapper<Employee> excelRowMapper(Integer versionNo) {
+	    private RowMapper<Employee> excelRowMapper(JdbcTemplate jdbcTemplate) {
 	    	 
-	        return new EmployeeRowMapper(versionNo);
+	        return new EmployeeRowMapper(jdbcTemplate);
 	    }
 	    
-	   
-	    @Bean
+	    @Lazy
+	    @Bean	   
 	    public ItemProcessor<Employee, HCDetails> processor() {
 	        return new ProcessorHCMasterBuild();
 	    }
@@ -128,8 +139,8 @@ public class BatchConfig {
 	    }*/
 
 	    
-	    
-	    @Bean
+	    @Lazy
+	    @Bean	    
 	    public JpaItemWriter<HCDetails> writer() {
 	        JpaItemWriter<HCDetails> writer = new JpaItemWriter<>();
 	        writer.setEntityManagerFactory(emf);
