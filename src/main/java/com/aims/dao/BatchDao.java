@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
+import com.aims.bo.BillingDetails;
 import com.aims.model.BillingVersion;
 
 public class BatchDao {
@@ -20,6 +21,11 @@ public class BatchDao {
 	
 	private String sqlBillingVersionWrite = "INSERT INTO aims.billingversion (brm, periodmonth, year, version, freezeind)"
 			+ "	VALUES (:brm, :month, :year, nextval('aims.seq_bill_version'), :freeze)";
+	
+	private String sqlBillRateUpdate ="UPDATE aims.billrate set billrate = :billrate where employee_id = :empid";
+	
+	private String sqlBillRateInsert ="INSERT INTO aims.billrate(employee_id, billrate, currencycr, enddate, startdate) "
+			+ "VALUES (:empid, :billrate, :currency, :enddate, :startdate)";
 	
 	String sretrieveSql = "SELECT version_no FROM aims.hcversion WHERE current_ind = ?";
 	
@@ -75,6 +81,21 @@ public class BatchDao {
 	{
 		return (Integer) jdbcTemplate.queryForObject(retrieveBillingVersionSql,Integer.class);
 	}
-
+	
+	public int upDateBillRate(KeyHolder holder,BillingDetails bd)
+	{		
+		SqlParameterSource parameters = new MapSqlParameterSource().addValue("billrate", bd.getBillRate())
+				.addValue("empid", bd.getEmpId());
+		return myJDBC.update(sqlBillRateUpdate, parameters, holder);
+	}
+	
+	public void insertBillRate(KeyHolder holder,BillingDetails bd)
+	{		
+		java.sql.Date sqlDate = new java.sql.Date(new java.util.Date().getTime());
+		SqlParameterSource parameters = new MapSqlParameterSource()
+				.addValue("empid", bd.getEmpId()).addValue("billrate", bd.getBillRate()).addValue("currency", null)
+				.addValue("enddate", null).addValue("startdate", sqlDate);
+		myJDBC.update(sqlBillRateInsert, parameters, holder);
+	}
 
 }

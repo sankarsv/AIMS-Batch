@@ -3,6 +3,8 @@ package com.aims.processor;
 import javax.sql.DataSource;
 
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 
 import com.aims.bo.BillingDetails;
 import com.aims.dao.BatchDao;
@@ -12,7 +14,12 @@ public class ProcessBillingMasterBuild implements ItemProcessor<BillingDetails, 
 
 	private int billingVersion;
 
+	private DataSource datasource = null;;
+
+	private BatchDao dao = null;
+
 	public ProcessBillingMasterBuild(DataSource datasource) {
+		this.datasource = datasource;
 		this.billingVersion = new BatchDao(datasource).retrieveBillingVersion();
 	}
 
@@ -22,12 +29,12 @@ public class ProcessBillingMasterBuild implements ItemProcessor<BillingDetails, 
 
 		BillingMaster mas = new BillingMaster();
 
-		mapBillingVersion(details, mas);
+		mapBillingMaster(details, mas);
 
 		return mas;
 	}
 
-	private void mapBillingVersion(BillingDetails bd, BillingMaster bm) {
+	private void mapBillingMaster(BillingDetails bd, BillingMaster bm) {
 
 		bm.setVersionNo(billingVersion);
 		bm.setEmpId(bd.getEmpId());
@@ -44,6 +51,21 @@ public class ProcessBillingMasterBuild implements ItemProcessor<BillingDetails, 
 		bm.setRemarks1(bd.getRemarks1());
 		bm.setRemarks2(bd.getRemarks2());
 
+		KeyHolder holder = new GeneratedKeyHolder();
+
+		if (getDao(datasource).upDateBillRate(holder, bd) == 0) {
+
+			getDao(datasource).insertBillRate(holder, bd);
+		}
+
+	}
+
+	private BatchDao getDao(DataSource datasource) {
+		if (this.dao == null) {
+			dao = new BatchDao(datasource);
+		}
+
+		return dao;
 	}
 
 }

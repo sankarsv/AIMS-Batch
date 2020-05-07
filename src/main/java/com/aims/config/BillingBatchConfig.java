@@ -75,6 +75,13 @@ public class BillingBatchConfig {
 		return stepBuilderFactory.get("performBillingMasterSave").<BillingDetails, BillingMaster>chunk(1000)
 				.reader(billingMasterReader()).processor(billMasterProcessor()).writer(billMasterWriter()).build();
 	}
+	
+	/*@Bean("billratesave")
+	@DependsOn("billingmastersave")
+	public Step performBillRateSave() throws Exception {
+		return stepBuilderFactory.get("performBillRateSave").<BillingMaster, BillRate>chunk(100)
+				.reader(billRateReader()).processor(billRateProcessor()).build();
+	}*/
 
 	@Lazy
 	@Bean
@@ -86,7 +93,7 @@ public class BillingBatchConfig {
 
 			JdbcTemplate jdbcTemplate = new JdbcTemplate(datasource);
 
-			input = new PushbackInputStream(new ByteArrayInputStream(ConfigurationHelper.getHcInter(jdbcTemplate)));
+			input = new PushbackInputStream(new ByteArrayInputStream(ConfigurationHelper.getBrInter(jdbcTemplate)));
 
 			InputStreamResource resource = new InputStreamResource(input);
 			reader.setUseDataFormatter(true);
@@ -111,7 +118,7 @@ public class BillingBatchConfig {
 
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(datasource);
 
-		input = new PushbackInputStream(new ByteArrayInputStream(ConfigurationHelper.getHcInter(jdbcTemplate)));
+		input = new PushbackInputStream(new ByteArrayInputStream(ConfigurationHelper.getBrInter(jdbcTemplate)));
 
 		InputStreamResource resource = new InputStreamResource(input);
 		reader.setUseDataFormatter(true);
@@ -122,7 +129,8 @@ public class BillingBatchConfig {
 
 		return reader;
 	}
-
+	 
+	
 	private RowMapper<BillingDetails> billingRowMapper() {
 
 		return new BillingRowMapper();
@@ -147,14 +155,8 @@ public class BillingBatchConfig {
 		return new ProcessBillingMasterBuild(datasource);
 
 	}
-
-	/*@Lazy
-	@Bean
-	public JpaItemWriter<BillingVersion> billVersionWriter() {
-		JpaItemWriter<BillingVersion> writer = new JpaItemWriter<>();
-		writer.setEntityManagerFactory(emf);
-		return writer;
-	}*/
+	
+	
 	
 	@Lazy
 	@Bean	
@@ -163,4 +165,6 @@ public class BillingBatchConfig {
 		writer.setEntityManagerFactory(emf);
 		return writer;
 	}
+	
+	
 }
