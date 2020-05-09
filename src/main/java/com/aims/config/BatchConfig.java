@@ -1,14 +1,10 @@
 package com.aims.config;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.PushbackInputStream;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManagerFactory;
@@ -24,13 +20,10 @@ import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.listener.ExecutionContextPromotionListener;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.excel.RowMapper;
 import org.springframework.batch.item.excel.poi.PoiItemReader;
-import org.springframework.batch.item.support.CompositeItemProcessor;
-import org.springframework.batch.item.support.CompositeItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -44,13 +37,13 @@ import org.springframework.jdbc.core.PreparedStatementSetter;
 
 import com.aims.bo.Employee;
 import com.aims.helper.ConfigurationHelper;
+import com.aims.helperinterface.BatchToOnlineTriggerhelperInterface;
 import com.aims.listener.JobCompletionListener;
 import com.aims.mapper.EmployeeRowMapper;
 import com.aims.model.HCDetails;
-import com.aims.model.HCEmployee;
-import com.aims.processor.ProcessHCEmployeeBuild;
 import com.aims.processor.ProcessorHCMasterBuild;
 import com.aims.tasklet.DbWriteTasklet;
+import com.aims.tasklet.HCChildSaveTasklet;
 
 @Configuration
 public class BatchConfig {
@@ -65,15 +58,23 @@ public class BatchConfig {
 	    private EntityManagerFactory emf;
 	    
 	    @Autowired
+		BatchToOnlineTriggerhelperInterface batchtoOnlineInt;
+	    
+	    @Autowired
 	    private DataSource datasource;
 	
 	 @Bean public Job processHeadCountJob() throws Exception { return jobBuilderFactory.get("processHeadCountJob")
 	 .incrementer(new RunIdIncrementer()).listener(listener())
-	 .start(performHCVersionSave()).on("*").to(orderStep2()).end().build(); } 
+	 .start(performHCVersionSave()).on("*").to(orderStep2()).next(performHCChildTableSave()).end().build(); } 
 	 
 	 @Bean("hcversionsave")
 	 public Step performHCVersionSave() { return
 			 stepBuilderFactory.get("performVersionSave").tasklet(new DbWriteTasklet(datasource)).listener(promotionListener()).build(); } 
+	 
+	 @Bean("hcChildTableSave")
+	 public Step performHCChildTableSave() { return
+			 stepBuilderFactory.get("performHCChildTableSave").tasklet(new HCChildSaveTasklet(batchtoOnlineInt)).build(); } 
+	
 	 
 	 @Bean("masterload")
 	 @DependsOn("hcversionsave")
@@ -98,6 +99,7 @@ public class BatchConfig {
 	 	return listener;
 	 }
 	 
+	  
 		 
 	/* @Bean public Step orderStep1() { return
 	 stepBuilderFactory.get("orderStep1").<HCIntermediate, String>
@@ -165,17 +167,7 @@ public class BatchConfig {
 
 	    }
 	    
-	    @Lazy
-	    @Bean
-	    public CompositeItemProcessor<HCDetails, ?> compositeItemProcessor(){
-	    	List<ItemProcessor<HCDetails, ?>> delegates = new ArrayList<>();
-	    	delegates.add(new ProcessHCEmployeeBuild());
-	        CompositeItemProcessor<HCDetails, ?> processor = new CompositeItemProcessor<>();
-	        processor.setDelegates(delegates);
-	        return processor;
-	    	
-	    }
-	    
+	   	    
 	   /* @Bean
 	    public ItemProcessor<HCIntermediate, String> processor2() {
 	        return new ProcessSetFileResource();
@@ -190,23 +182,6 @@ public class BatchConfig {
 	        return writer;
 	    }
 	    
-	    
-	    @Lazy
-	    @Bean	    
-	    public JpaItemWriter<HCEmployee> writer2() {
-	        JpaItemWriter<HCEmployee> writer = new JpaItemWriter<>();
-	        writer.setEntityManagerFactory(emf);
-	        return writer;
-	    }
-	    
-	    public CompositeItemWriter<?> compositeItemWriter(){
-	        CompositeItemWriter writer = new CompositeItemWriter();
-	        writer.setDelegates(Arrays.asList(writer2()));
-	        return writer;
-	    }
-
-	    
-	   
 	    
 		/*
 		 * @Bean public JpaItemWriter<VersionInfo> writer2() {

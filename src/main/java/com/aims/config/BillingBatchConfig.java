@@ -35,6 +35,8 @@ import com.aims.model.BillingMaster;
 import com.aims.model.BillingVersion;
 import com.aims.processor.ProcessBillingMasterBuild;
 import com.aims.processor.ProcessBillingVersionBuild;
+import com.aims.step.Writer;
+import com.aims.tasklet.DbWriteTasklet;
 
 @Configuration
 public class BillingBatchConfig {
@@ -66,9 +68,11 @@ public class BillingBatchConfig {
 	@Bean("billingversionsave")
 	public Step performBillingVersionSave() throws Exception {
 		return stepBuilderFactory.get("performBillingVersionSave").<BillingDetails, BillingVersion>chunk(1000)
-				.reader(billingReader()).processor(billVersionprocessor()).build();
+				.reader(billingReader()).processor(billVersionprocessor()).writer(new Writer()).build();
 	}
 
+	
+	 
 	@Bean("billingmastersave")
 	@DependsOn("billingversionsave")
 	public Step performBillingMasterSave() throws Exception {
@@ -165,6 +169,10 @@ public class BillingBatchConfig {
 		writer.setEntityManagerFactory(emf);
 		return writer;
 	}
+	
+
+	
+
 	
 	
 }
