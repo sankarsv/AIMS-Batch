@@ -29,6 +29,8 @@ public class BatchDao {
 	
 	String sretrieveSql = "SELECT version_no FROM aims.hcversion WHERE current_ind = ?";
 	
+	String checkIfbillingVersionSql = "SELECT version FROM aims.billingversion WHERE brm = ? and year =? and periodmonth=?";
+	
 	String retrieveBillingVersionSql = "select max(version) as version_no from aims.billingversion";
 	
 	private NamedParameterJdbcTemplate myJDBC = null;
@@ -70,6 +72,14 @@ public class BatchDao {
 				.addValue("year", bv.getYear())
 				.addValue("freeze", bv.getFreezeInd());
 		myJDBC.update(sqlBillingVersionWrite, insParam, holder);
+	}
+	
+	public boolean checkBillingVersionExist(BillingVersion bv)
+	{
+		int returnval = (Integer) jdbcTemplate.queryForObject(checkIfbillingVersionSql, new Object[] {bv.getBrmRef(),bv.getYear(),bv.getMonth()}, Integer.class);
+		if(returnval>0)
+			return true;
+		return false;
 	}
 	
 	public Integer retrieveHCVersion()

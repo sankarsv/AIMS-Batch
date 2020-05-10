@@ -9,13 +9,15 @@ import com.aims.dao.BatchDao;
 import com.aims.model.BillingVersion;
 
 public class ProcessBillingVersionBuild implements ItemProcessor<BillingDetails, BillingVersion> {
-	
+
 	private DataSource datasource;
 	
-	private boolean isVersionInsert=false;
-	
+	private BatchDao dao;
+
+	private boolean isVersionInsert = false;
+
 	public ProcessBillingVersionBuild(DataSource datasource) {
-		this.datasource=datasource;
+		this.datasource = datasource;
 	}
 
 	@Override
@@ -25,11 +27,10 @@ public class ProcessBillingVersionBuild implements ItemProcessor<BillingDetails,
 		BillingVersion vers = new BillingVersion();
 
 		mapBillingVersion(details, vers);
-		
-		if(!isVersionInsert)
-		{
-			new BatchDao(datasource).insertBillingVersion(vers);
-			isVersionInsert=true;
+
+		if (!isVersionInsert && !(getDao().checkBillingVersionExist(vers))) {
+			getDao().insertBillingVersion(vers);
+			isVersionInsert = true;
 		}
 
 		return vers;
@@ -42,6 +43,14 @@ public class ProcessBillingVersionBuild implements ItemProcessor<BillingDetails,
 		bv.setMonth(bd.getBillMonth());
 		bv.setVersionNo(0);
 		bv.setFreezeInd("N");
+	}
+	
+	private BatchDao getDao() {
+		if(dao==null) {
+			dao = new BatchDao(datasource);
+			
+		}
+		return dao;
 	}
 
 }
