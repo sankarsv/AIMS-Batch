@@ -31,6 +31,15 @@ public class ProcessBillingMasterBuild implements ItemProcessor<BillingDetails, 
 
 		mapBillingMaster(details, mas);
 
+		KeyHolder holder = new GeneratedKeyHolder();
+
+		getDao(datasource).insertBillingDetails(holder, mas);
+
+		if (getDao(datasource).upDateBillRate(holder, details) == 0) {
+
+			getDao(datasource).insertBillRate(holder, details, billingVersion);
+		}
+
 		return mas;
 	}
 
@@ -51,12 +60,7 @@ public class ProcessBillingMasterBuild implements ItemProcessor<BillingDetails, 
 		bm.setRemarks1(bd.getRemarks1());
 		bm.setRemarks2(bd.getRemarks2());
 
-		KeyHolder holder = new GeneratedKeyHolder();
-
-		if (getDao(datasource).upDateBillRate(holder, bd) == 0) {
-
-			getDao(datasource).insertBillRate(holder, bd);
-		}
+		
 
 	}
 

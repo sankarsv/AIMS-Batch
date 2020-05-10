@@ -5,9 +5,11 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
 
 @Entity
+@IdClass(BillRatePk.class)
 @Table(name="BILLRATE",schema="aims")
 public class BillRate  implements Serializable{
 
@@ -16,13 +18,17 @@ public class BillRate  implements Serializable{
 	 */
 	private static final long serialVersionUID = 7536774219345394015L;
 	@Id
-	@Column(name="employee_id")	
+	@Column(name="billing_employee_id")	
 	private String empId;
+	
+	@Id
+	@Column(name="billing_version")	
+	private int version;
 	
 	@Column(name="billrate")	
 	private String billrate;
 	
-	@Column(name="currencycr")	
+	@Column(name="currencr")	
 	private String currentyCR;
 	
 	@Column(name="startdate")	

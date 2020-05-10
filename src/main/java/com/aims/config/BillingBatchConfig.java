@@ -35,8 +35,8 @@ import com.aims.model.BillingMaster;
 import com.aims.model.BillingVersion;
 import com.aims.processor.ProcessBillingMasterBuild;
 import com.aims.processor.ProcessBillingVersionBuild;
+import com.aims.step.BillingMasterWriter;
 import com.aims.step.Writer;
-import com.aims.tasklet.DbWriteTasklet;
 
 @Configuration
 public class BillingBatchConfig {
@@ -71,21 +71,22 @@ public class BillingBatchConfig {
 				.reader(billingReader()).processor(billVersionprocessor()).writer(new Writer()).build();
 	}
 
-	
-	 
 	@Bean("billingmastersave")
 	@DependsOn("billingversionsave")
 	public Step performBillingMasterSave() throws Exception {
 		return stepBuilderFactory.get("performBillingMasterSave").<BillingDetails, BillingMaster>chunk(1000)
-				.reader(billingMasterReader()).processor(billMasterProcessor()).writer(billMasterWriter()).build();
+				.reader(billingMasterReader()).processor(billMasterProcessor()).writer(new BillingMasterWriter()).build();
 	}
-	
-	/*@Bean("billratesave")
-	@DependsOn("billingmastersave")
-	public Step performBillRateSave() throws Exception {
-		return stepBuilderFactory.get("performBillRateSave").<BillingMaster, BillRate>chunk(100)
-				.reader(billRateReader()).processor(billRateProcessor()).build();
-	}*/
+
+	/*
+	 * @Bean("billratesave")
+	 * 
+	 * @DependsOn("billingmastersave") public Step performBillRateSave() throws
+	 * Exception { return
+	 * stepBuilderFactory.get("performBillRateSave").<BillingMaster,
+	 * BillRate>chunk(100)
+	 * .reader(billRateReader()).processor(billRateProcessor()).build(); }
+	 */
 
 	@Lazy
 	@Bean
@@ -114,7 +115,7 @@ public class BillingBatchConfig {
 	}
 
 	@Lazy
-	@Bean	
+	@Bean
 	ItemReader<BillingDetails> billingMasterReader() throws Exception {
 
 		PoiItemReader<BillingDetails> reader = new PoiItemReader<BillingDetails>();
@@ -133,8 +134,7 @@ public class BillingBatchConfig {
 
 		return reader;
 	}
-	 
-	
+
 	private RowMapper<BillingDetails> billingRowMapper() {
 
 		return new BillingRowMapper();
@@ -151,7 +151,7 @@ public class BillingBatchConfig {
 		return new ProcessBillingVersionBuild(datasource);
 
 	}
-	
+
 	@Lazy
 	@Bean
 	@StepScope
@@ -159,20 +159,13 @@ public class BillingBatchConfig {
 		return new ProcessBillingMasterBuild(datasource);
 
 	}
-	
-	
-	
+
 	@Lazy
-	@Bean	
+	@Bean
 	public JpaItemWriter<BillingMaster> billMasterWriter() {
 		JpaItemWriter<BillingMaster> writer = new JpaItemWriter<>();
 		writer.setEntityManagerFactory(emf);
 		return writer;
 	}
-	
 
-	
-
-	
-	
 }
