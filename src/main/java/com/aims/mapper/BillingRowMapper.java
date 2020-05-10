@@ -9,18 +9,18 @@ import com.aims.bo.BillingDetails;
 
 public class BillingRowMapper implements RowMapper<BillingDetails> {
 
-	private BillingDetails details = null;
 
 	public BillingRowMapper() {
-		details = new BillingDetails();
 	}
 
 	@Override
 	public BillingDetails mapRow(RowSet rs) throws Exception {
+		
+		BillingDetails details =  new BillingDetails();
 
 		if (rs == null || rs.getCurrentRow() == null 
-				|| rs.getCurrentRowIndex() > 2
-				|| !rs.getMetaData().getSheetName().equalsIgnoreCase("Sheet1")) {
+				
+				|| (rs.getMetaData().getSheetName()!=null && !rs.getMetaData().getSheetName().equalsIgnoreCase("Sheet1"))) {
 			return null;
 		}
 

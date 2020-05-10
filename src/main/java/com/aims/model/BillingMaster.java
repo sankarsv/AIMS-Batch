@@ -26,6 +26,15 @@ public class BillingMaster implements Serializable {
 
 	@Column(name = "DMNAME")
 	private String dmName;
+	
+	@Column(name="BRMNAME")
+	private String brmName;
+	
+	@Column(name="EMPLOYEE_NAME")
+	private String empName;
+	
+	@Column(name="OFFICEID")
+	private String officeId;
 
 	@Column(name = "WON")
 	private String wonNumber;
@@ -170,5 +179,29 @@ public class BillingMaster implements Serializable {
 
 	public void setRemarks2(String remarks2) {
 		this.remarks2 = remarks2;
+	}
+
+	public String getBrmName() {
+		return brmName;
+	}
+
+	public void setBrmName(String brmName) {
+		this.brmName = brmName;
+	}
+
+	public String getEmpName() {
+		return empName;
+	}
+
+	public void setEmpName(String empName) {
+		this.empName = empName;
+	}
+
+	public String getOfficeId() {
+		return officeId;
+	}
+
+	public void setOfficeId(String officeId) {
+		this.officeId = officeId;
 	}
 }

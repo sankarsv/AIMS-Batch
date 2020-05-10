@@ -14,8 +14,6 @@ public class ProcessBillingVersionBuild implements ItemProcessor<BillingDetails,
 	
 	private BatchDao dao;
 
-	private boolean isVersionInsert = false;
-
 	public ProcessBillingVersionBuild(DataSource datasource) {
 		this.datasource = datasource;
 	}
@@ -28,9 +26,8 @@ public class ProcessBillingVersionBuild implements ItemProcessor<BillingDetails,
 
 		mapBillingVersion(details, vers);
 
-		if (!isVersionInsert && !(getDao().checkBillingVersionExist(vers))) {
+		if (!(getDao().checkBillingVersionExist(vers))) {
 			getDao().insertBillingVersion(vers);
-			isVersionInsert = true;
 		}
 
 		return vers;

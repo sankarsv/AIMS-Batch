@@ -12,7 +12,6 @@ import com.aims.model.BillingMaster;
 
 public class ProcessBillingMasterBuild implements ItemProcessor<BillingDetails, BillingMaster> {
 
-	private int billingVersion;
 
 	private DataSource datasource = null;;
 
@@ -20,20 +19,24 @@ public class ProcessBillingMasterBuild implements ItemProcessor<BillingDetails, 
 
 	public ProcessBillingMasterBuild(DataSource datasource) {
 		this.datasource = datasource;
-		this.billingVersion = new BatchDao(datasource).retrieveBillingVersion();
-	}
+			}
 
 	@Override
 	public BillingMaster process(BillingDetails details) throws Exception {
 		// TODO Auto-generated method stub
 
 		BillingMaster mas = new BillingMaster();
+		
+		int billingVersion = getDao(datasource).retrieveBillingVersion(details);
 
-		mapBillingMaster(details, mas);
+		mapBillingMaster(details, mas,billingVersion);
 
 		KeyHolder holder = new GeneratedKeyHolder();
 
-		getDao(datasource).insertBillingDetails(holder, mas);
+		if (getDao(datasource).upDateBillMaster(holder, mas) == 0 ){
+		
+			getDao(datasource).insertBillingDetails(holder, mas);
+		}
 
 		if (getDao(datasource).upDateBillRate(holder, details) == 0) {
 
@@ -43,8 +46,9 @@ public class ProcessBillingMasterBuild implements ItemProcessor<BillingDetails, 
 		return mas;
 	}
 
-	private void mapBillingMaster(BillingDetails bd, BillingMaster bm) {
-
+	private void mapBillingMaster(BillingDetails bd, BillingMaster bm, int billingVersion) {
+		
+		
 		bm.setVersionNo(billingVersion);
 		bm.setEmpId(bd.getEmpId());
 		bm.setDmName(bd.getDmName());
@@ -59,8 +63,9 @@ public class ProcessBillingMasterBuild implements ItemProcessor<BillingDetails, 
 		bm.setBillableAmount(bd.getBillableAmount());
 		bm.setRemarks1(bd.getRemarks1());
 		bm.setRemarks2(bd.getRemarks2());
-
-		
+		bm.setEmpName(bd.getEmpName());
+		bm.setBrmName(bd.getBrm());
+		bm.setOfficeId(bd.getOfficeId());
 
 	}
 

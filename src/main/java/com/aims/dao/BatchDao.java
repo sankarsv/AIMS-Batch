@@ -1,5 +1,7 @@
 package com.aims.dao;
 
+import java.time.LocalDate;
+
 import javax.sql.DataSource;
 
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -26,18 +28,23 @@ public class BatchDao {
 	
 	private String sqlBillRateUpdate ="UPDATE aims.billrate set billrate = :billrate where billing_employee_id = :empid";
 	
+	private String sqlBillMasterUpdate ="UPDATE aims.billingmaster set dmname = :dmname, won= :won, onsite_offshore=:onof, sto=:sto, billablehours=:billablehours,"
+			+ " billabledays=:billabledays, effort=:effort, extrahours=:extrahours, extrabilling=:extrabilling, billableamount=:billableamount,"
+			+ " remarks1=:remarks1,remarks2=:remarks2, brmname=:brmname,officeid=:officeid,employee_name=:empname where employee_id = :empid and version=:version";
+	
 	private String sqlBillRateInsert ="INSERT INTO aims.billrate(billing_employee_id, billrate, currencr, enddate, startdate, billing_version) "
 			+ "VALUES (:empid, :billrate, :currency, :enddate, :startdate, :version)";
 	
 	private String sqlBillMasterInsert ="INSERT INTO aims.billingmaster(version, employee_id, dmname, won, onsite_offshore, sto, billablehours, billabledays, effort, extrahours, "
-			+ "extrabilling, billableamount, remarks1, remarks2) "
-			+ "VALUES (:version, :empid, :dmname, :won, :onsiteoffshore, :sto, :billablehrs, :billabledays, :effort, :extrahours, :extrabilling, :billableamount, :remarks1, :remarks2)";
+			+ "extrabilling, billableamount, remarks1, remarks2, brmname, officeid, employee_name) "
+			+ "VALUES (:version, :empid, :dmname, :won, :onsiteoffshore, :sto, :billablehrs, :billabledays, :effort, :extrahours, :extrabilling, :billableamount, :remarks1, :remarks2"
+			+ ", :brm, :officeid, :empname)";
 	
 	String sretrieveSql = "SELECT version_no FROM aims.hcversion WHERE current_ind = ?";
 	
 	String checkIfbillingVersionSql = "SELECT version FROM aims.billingversion WHERE brm = ? and year =? and periodmonth=?";
 	
-	String retrieveBillingVersionSql = "select max(version) as version_no from aims.billingversion";
+	String retrieveBillingVersionSql = "select version from aims.billingversion WHERE brm = ? and periodmonth=? and year =?";
 	
 	private NamedParameterJdbcTemplate myJDBC = null;
 	
@@ -96,9 +103,13 @@ public class BatchDao {
 		return (Integer) jdbcTemplate.queryForObject(sretrieveSql, new Object[] {"Y"}, Integer.class);
 	}
 	
-	public Integer retrieveBillingVersion()
+	public Integer retrieveBillingVersion(BillingDetails bd)
 	{
-		return (Integer) jdbcTemplate.queryForObject(retrieveBillingVersionSql,Integer.class);
+		LocalDate currentDate = LocalDate.now();
+
+		String month =currentDate.getMonth().toString();
+		int year = currentDate.getYear();
+		return (Integer) jdbcTemplate.queryForObject(retrieveBillingVersionSql,new Object[] {bd.getBrm(),month,year},Integer.class);
 	}
 	
 	public int upDateBillRate(KeyHolder holder,BillingDetails bd)
@@ -107,6 +118,20 @@ public class BatchDao {
 				.addValue("empid", bd.getEmpId());
 		return myJDBC.update(sqlBillRateUpdate, parameters, holder);
 	}
+	
+	public int upDateBillMaster(KeyHolder holder,BillingMaster bd)
+	{	
+		SqlParameterSource parameters = new MapSqlParameterSource()
+				.addValue("dmname", bd.getDmName())
+				.addValue("won", bd.getWonNumber()).addValue("onof", bd.getOnsiteOffshore()).addValue("sto", bd.getSto())
+				.addValue("billablehours", bd.getBillablehrs()).addValue("billabledays", bd.getBillableDays())
+				.addValue("effort", bd.getEffort()).addValue("extrahours", bd.getExtraHours()).addValue("extrabilling", bd.getExtraBilling())
+				.addValue("billableamount", bd.getBillableAmount()).addValue("remarks1", bd.getRemarks1())
+				.addValue("remarks2", bd.getRemarks2()).addValue("brmname", bd.getBrmName()).addValue("officeid", bd.getOfficeId())
+				.addValue("empname", bd.getEmpName()).addValue("empid", bd.getEmpId()).addValue("version", bd.getVersionNo());
+		return myJDBC.update(sqlBillMasterUpdate, parameters, holder);
+	}
+
 	
 	public void insertBillRate(KeyHolder holder,BillingDetails bd,int billingVersion)
 	{		
@@ -125,7 +150,8 @@ public class BatchDao {
 				.addValue("billablehrs", bd.getBillablehrs()).addValue("billabledays", bd.getBillableDays())
 				.addValue("effort", bd.getEffort()).addValue("extrahours", bd.getExtraHours()).addValue("extrabilling", bd.getExtraBilling())
 				.addValue("billableamount", bd.getBillableAmount()).addValue("remarks1", bd.getRemarks1())
-				.addValue("remarks2", bd.getRemarks2());
+				.addValue("remarks2", bd.getRemarks2()).addValue("brm", bd.getBrmName()).addValue("officeid", bd.getOfficeId())
+				.addValue("empname", bd.getEmpName());
 		myJDBC.update(sqlBillMasterInsert, parameters, holder);
 	}
 
