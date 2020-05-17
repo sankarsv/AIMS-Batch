@@ -6,6 +6,7 @@ import java.io.PushbackInputStream;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
@@ -28,6 +29,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.aims.bo.BillingDetails;
 import com.aims.helper.ConfigurationHelper;
+import com.aims.listener.BillingJobCompletionListener;
 import com.aims.listener.JobCompletionListener;
 import com.aims.mapper.BillingMasterRowMapper;
 import com.aims.mapper.BillingRowMapper;
@@ -37,6 +39,7 @@ import com.aims.processor.ProcessBillingMasterBuild;
 import com.aims.processor.ProcessBillingVersionBuild;
 import com.aims.step.BillingMasterWriter;
 import com.aims.step.Writer;
+import com.aims.tasklet.ErrorTasklet;
 
 @Configuration
 public class BillingBatchConfig {
@@ -56,13 +59,25 @@ public class BillingBatchConfig {
 	@Bean
 	public Job processBillingDetailsJob() throws Exception {
 		return jobBuilderFactory.get("processBillingDetailsJob").incrementer(new RunIdIncrementer())
-				.listener(billingListener()).flow(performBillingVersionSave()).next(performBillingMasterSave()).end()
+				.listener(billingListener())
+				.start(performBillingVersionSave())
+				.on(ExitStatus.FAILED.getExitCode()).to(billingErrorTasklet())
+				.from(performBillingVersionSave())
+				.on(("*")).to(performBillingMasterSave())
+				.on(ExitStatus.FAILED.getExitCode()).to(billingErrorTasklet()).end()
 				.build();
 	}
 
 	@Bean
+	@Lazy
 	public JobExecutionListener billingListener() {
-		return new JobCompletionListener();
+		return new BillingJobCompletionListener(datasource);
+	}
+	
+	@Bean("billingErrorTasklet")
+	public Step billingErrorTasklet() {
+		return stepBuilderFactory.get("billingErrorTasklet").tasklet(new ErrorTasklet())
+				.build();
 	}
 
 	@Bean("billingversionsave")
@@ -88,13 +103,15 @@ public class BillingBatchConfig {
 	 * .reader(billRateReader()).processor(billRateProcessor()).build(); }
 	 */
 
-	@Lazy
+	
 	@Bean
+	@Lazy
 	ItemReader<BillingDetails> billingReader() throws Exception {
 
 		PoiItemReader<BillingDetails> reader = new PoiItemReader<BillingDetails>();
 		PushbackInputStream input = null;
 		try {
+			reader.setRowMapper(billingRowMapper());
 
 			JdbcTemplate jdbcTemplate = new JdbcTemplate(datasource);
 
@@ -105,7 +122,6 @@ public class BillingBatchConfig {
 			reader.setLinesToSkip(2);
 			reader.setResource(resource);
 			reader.setCurrentSheet(0);
-			reader.setRowMapper(billingRowMapper());
 
 		} catch (Exception ex) {
 			System.out.println("Upload file is of not of type head count report");
@@ -114,11 +130,13 @@ public class BillingBatchConfig {
 		return reader;
 	}
 
-	@Lazy
+	
 	@Bean
+	@Lazy
 	ItemReader<BillingDetails> billingMasterReader() throws Exception {
 
 		PoiItemReader<BillingDetails> reader = new PoiItemReader<BillingDetails>();
+		reader.setRowMapper(billingMasterRowMapper());
 		PushbackInputStream input = null;
 
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(datasource);
@@ -130,7 +148,7 @@ public class BillingBatchConfig {
 		reader.setLinesToSkip(2);
 		reader.setResource(resource);
 		reader.setCurrentSheet(0);
-		reader.setRowMapper(billingMasterRowMapper());
+		
 
 		return reader;
 	}
@@ -145,14 +163,13 @@ public class BillingBatchConfig {
 		return new BillingMasterRowMapper();
 	}
 
-	@Lazy
 	@Bean
+	@StepScope
 	public ItemProcessor<BillingDetails, BillingVersion> billVersionprocessor() {
 		return new ProcessBillingVersionBuild(datasource);
 
 	}
 
-	@Lazy
 	@Bean
 	@StepScope
 	public ItemProcessor<BillingDetails, BillingMaster> billMasterProcessor() {
@@ -160,8 +177,8 @@ public class BillingBatchConfig {
 
 	}
 
-	@Lazy
 	@Bean
+	@StepScope
 	public JpaItemWriter<BillingMaster> billMasterWriter() {
 		JpaItemWriter<BillingMaster> writer = new JpaItemWriter<>();
 		writer.setEntityManagerFactory(emf);

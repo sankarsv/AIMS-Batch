@@ -20,6 +20,10 @@ public class BatchDao {
 	
 	private String sqlUpdate = "UPDATE aims.hcversion set current_ind = :ind where current_ind = :indold";
 	
+	private String deleteHCIntermediate = "delete from aims.hc_intermediate";
+	
+	private String deleteBRIntermediate = "delete from aims.br_intermediate";
+	
 	private String sqlWrite = "INSERT INTO aims.hcversion(version_no,load_date, description, current_ind)"
 			+ "	VALUES (nextval('aims.seq_version_no'), :loadDate, :desc, :curr)";
 	
@@ -117,6 +121,16 @@ public class BatchDao {
 		SqlParameterSource parameters = new MapSqlParameterSource().addValue("billrate", bd.getBillRate())
 				.addValue("empid", bd.getEmpId());
 		return myJDBC.update(sqlBillRateUpdate, parameters, holder);
+	}
+	
+	public int deleteHCIntermediate()
+	{		
+		return myJDBC.update(deleteHCIntermediate, new MapSqlParameterSource());
+	}
+	
+	public int deleteBRIntermediate()
+	{		
+		return myJDBC.update(deleteBRIntermediate, new MapSqlParameterSource());
 	}
 	
 	public int upDateBillMaster(KeyHolder holder,BillingMaster bd)

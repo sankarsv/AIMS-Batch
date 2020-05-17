@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
@@ -43,150 +44,166 @@ import com.aims.mapper.EmployeeRowMapper;
 import com.aims.model.HCDetails;
 import com.aims.processor.ProcessorHCMasterBuild;
 import com.aims.tasklet.DbWriteTasklet;
+import com.aims.tasklet.ErrorTasklet;
 import com.aims.tasklet.HCChildSaveTasklet;
 
 @Configuration
 public class BatchConfig {
 
-	
-	  @Autowired public JobBuilderFactory jobBuilderFactory;
-	  
-	  @Autowired public StepBuilderFactory stepBuilderFactory;
+	@Autowired
+	public JobBuilderFactory jobBuilderFactory;
 
-	  
-	    @Autowired
-	    private EntityManagerFactory emf;
-	    
-	    @Autowired
-		BatchToOnlineTriggerhelperInterface batchtoOnlineInt;
-	    
-	    @Autowired
-	    private DataSource datasource;
-	
-	 @Bean public Job processHeadCountJob() throws Exception { return jobBuilderFactory.get("processHeadCountJob")
-	 .incrementer(new RunIdIncrementer()).listener(listener())
-	 .start(performHCVersionSave()).on("*").to(orderStep2()).next(performHCChildTableSave()).end().build(); } 
-	 
-	 @Bean("hcversionsave")
-	 public Step performHCVersionSave() { return
-			 stepBuilderFactory.get("performVersionSave").tasklet(new DbWriteTasklet(datasource)).listener(promotionListener()).build(); } 
-	 
-	 @Bean("hcChildTableSave")
-	 public Step performHCChildTableSave() { return
-			 stepBuilderFactory.get("performHCChildTableSave").tasklet(new HCChildSaveTasklet(batchtoOnlineInt)).build(); } 
-	
-	 
-	 @Bean("masterload")
-	 @DependsOn("hcversionsave")
-	 public Step orderStep2() throws Exception { return
-	 stepBuilderFactory.get("orderStep2").<Employee, HCDetails> chunk(1000) .reader(excelStudentReader())
-	 .processor(processor())
-	 .writer(writer())
-	 .build(); }
-	 
-	/* @Bean
-	 @DependsOn("masterload")
-	 public Step orderStep3() { return
-			 stepBuilderFactory.get("orderStep3").<HCDetails,Object> chunk(1000).reader(databaseItemReader(0))
-			 .processor(compositeItemProcessor()).writer(compositeItemWriter()).build(); }*/
-	 
-	 @Bean
-	 public ExecutionContextPromotionListener promotionListener() {
-	 	ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
+	@Autowired
+	public StepBuilderFactory stepBuilderFactory;
 
-	 	listener.setKeys(new String[] {"versionNo" });
+	@Autowired
+	private EntityManagerFactory emf;
 
-	 	return listener;
-	 }
-	 
-	  
-		 
-	/* @Bean public Step orderStep1() { return
-	 stepBuilderFactory.get("orderStep1").<HCIntermediate, String>
-	 chunk(1).reader(databaseItemReader()).processor(processor2()) .build(); }*/
-		
-	 
-	 @Bean public JobExecutionListener listener() { return new
-			 JobCompletionListener(); }
-	 
+	@Autowired
+	BatchToOnlineTriggerhelperInterface batchtoOnlineInt;
 
-	 @Lazy
-	 @Bean	 
-    ItemReader<Employee> excelStudentReader() throws Exception {		 	
-		 
-	        PoiItemReader<Employee> reader = new PoiItemReader<Employee>();
-	        PushbackInputStream input = null;
-	       
-	        
-	        
-			JdbcTemplate jdbcTemplate = new JdbcTemplate(datasource);		
-			
-			input = new PushbackInputStream(new ByteArrayInputStream(ConfigurationHelper.getHcInter(jdbcTemplate)));
-			
-	        InputStreamResource resource = new InputStreamResource(input);
-	        reader.setUseDataFormatter(true);
-	        reader.setLinesToSkip(1);
-	        reader.setResource(resource);
-	        reader.setRowMapper(excelRowMapper(jdbcTemplate));
-	        reader.setCurrentSheet(1);
-	       
-	        
-	        
-	        
-	        return reader;
-	    }
+	@Autowired
+	private DataSource datasource;
+
+	@Bean
+	public Job processHeadCountJob() throws Exception {
+		return jobBuilderFactory.get("processHeadCountJob").incrementer(new RunIdIncrementer()).listener(listener())
+				.start(performHCVersionSave()).on("*")
+				.to(orderStep2())
+				.on(ExitStatus.FAILED.getExitCode())
+				.to(errorTasklet())
+				.from(orderStep2())
+				.on("*").to(performHCChildTableSave()).end().build();
+	}
+
+	//.next(performHCChildTableSave())
+	@Bean("hcversionsave")
+	public Step performHCVersionSave() {
+		return stepBuilderFactory.get("performVersionSave").tasklet(new DbWriteTasklet(datasource))
+				.listener(promotionListener()).build();
+	}
+
+	@Bean("hcChildTableSave")
+	public Step performHCChildTableSave() {
+		return stepBuilderFactory.get("performHCChildTableSave").tasklet(new HCChildSaveTasklet(batchtoOnlineInt))
+				.build();
+	}
 	
-	 @Bean
-	 @StepScope
-	 JdbcCursorItemReader<HCDetails> databaseItemReader(@Value("#{jobExecutionContext[versionNo]}")int version) { 
-		 Map<String, Object> namedParameters = new HashMap<String, Object>() {{
+	@Bean("errorTasklet")
+	public Step errorTasklet() {
+		return stepBuilderFactory.get("errorTasklet").tasklet(new ErrorTasklet())
+				.build();
+	}
+
+
+	@Bean("masterload")
+	@DependsOn("hcversionsave")
+	public Step orderStep2() throws Exception {
+		return stepBuilderFactory.get("orderStep2").<Employee, HCDetails>chunk(1000).reader(excelStudentReader())
+				.processor(processor()).writer(writer()).build();
+	}
+
+	/*
+	 * @Bean
+	 * 
+	 * @DependsOn("masterload") public Step orderStep3() { return
+	 * stepBuilderFactory.get("orderStep3").<HCDetails,Object>
+	 * chunk(1000).reader(databaseItemReader(0))
+	 * .processor(compositeItemProcessor()).writer(compositeItemWriter()).build(); }
+	 */
+
+	@Bean
+	public ExecutionContextPromotionListener promotionListener() {
+		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
+
+		listener.setKeys(new String[] { "versionNo" });
+
+		return listener;
+	}
+
+	/*
+	 * @Bean public Step orderStep1() { return
+	 * stepBuilderFactory.get("orderStep1").<HCIntermediate, String>
+	 * chunk(1).reader(databaseItemReader()).processor(processor2()) .build(); }
+	 */
+
+	@Bean
+	@Lazy
+	public JobExecutionListener listener() {
+		return new JobCompletionListener(datasource);
+	}
+
+	@Bean
+	@Lazy
+	ItemReader<Employee> excelStudentReader() throws Exception {
+
+		PoiItemReader<Employee> reader = new PoiItemReader<Employee>();
+		PushbackInputStream input = null;
+
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(datasource);
+
+		input = new PushbackInputStream(new ByteArrayInputStream(ConfigurationHelper.getHcInter(jdbcTemplate)));
+
+		InputStreamResource resource = new InputStreamResource(input);
+		reader.setUseDataFormatter(true);
+		reader.setLinesToSkip(1);
+		reader.setResource(resource);
+		reader.setRowMapper(excelRowMapper(jdbcTemplate));
+		reader.setCurrentSheet(1);
+
+		return reader;
+	}
+
+	@Bean
+	@StepScope
+	JdbcCursorItemReader<HCDetails> databaseItemReader(@Value("#{jobExecutionContext[versionNo]}") int version) {
+		Map<String, Object> namedParameters = new HashMap<String, Object>() {
+			{
 				put("versionNum", version);
-			}};
-			JdbcCursorItemReader<HCDetails> databaseReader = new JdbcCursorItemReader<>();
-		 	databaseReader.setDataSource(datasource);
-		 	databaseReader.setSql("SELECT * FROM aims.hcmaster where version_no= ?");		 	
-			databaseReader.setPreparedStatementSetter(new PreparedStatementSetter() {
+			}
+		};
+		JdbcCursorItemReader<HCDetails> databaseReader = new JdbcCursorItemReader<>();
+		databaseReader.setDataSource(datasource);
+		databaseReader.setSql("SELECT * FROM aims.hcmaster where version_no= ?");
+		databaseReader.setPreparedStatementSetter(new PreparedStatementSetter() {
 
-				public void setValues(PreparedStatement preparedStatement) throws SQLException {
-					preparedStatement.setInt(1, version);
-				}
-			});
-		 	databaseReader.setRowMapper(new BeanPropertyRowMapper<>(HCDetails.class));
-	        return databaseReader;
-	    }
-	
-	    private RowMapper<Employee> excelRowMapper(JdbcTemplate jdbcTemplate) {
-	    	 
-	        return new EmployeeRowMapper(jdbcTemplate);
-	    }
-	    
-	    @Lazy
-	    @Bean	   
-	    public ItemProcessor<Employee, HCDetails> processor() {
-	        return new ProcessorHCMasterBuild();
+			public void setValues(PreparedStatement preparedStatement) throws SQLException {
+				preparedStatement.setInt(1, version);
+			}
+		});
+		databaseReader.setRowMapper(new BeanPropertyRowMapper<>(HCDetails.class));
+		return databaseReader;
+	}
 
-	    }
-	    
-	   	    
-	   /* @Bean
-	    public ItemProcessor<HCIntermediate, String> processor2() {
-	        return new ProcessSetFileResource();
-	    }*/
+	private RowMapper<Employee> excelRowMapper(JdbcTemplate jdbcTemplate) {
 
-	    
-	    @Lazy
-	    @Bean	    
-	    public JpaItemWriter<HCDetails> writer() {
-	        JpaItemWriter<HCDetails> writer = new JpaItemWriter<>();
-	        writer.setEntityManagerFactory(emf);
-	        return writer;
-	    }
-	    
-	    
-		/*
-		 * @Bean public JpaItemWriter<VersionInfo> writer2() {
-		 * JpaItemWriter<VersionInfo> writer = new JpaItemWriter<>();
-		 * writer.setEntityManagerFactory(emf); return writer; }
-		 */
+		return new EmployeeRowMapper(jdbcTemplate);
+	}
+
+	@Bean
+	@StepScope
+	public ItemProcessor<Employee, HCDetails> processor() {
+		return new ProcessorHCMasterBuild();
+
+	}
+
+	/*
+	 * @Bean public ItemProcessor<HCIntermediate, String> processor2() { return new
+	 * ProcessSetFileResource(); }
+	 */
+
+	@Bean
+	@StepScope
+	public JpaItemWriter<HCDetails> writer() {
+		JpaItemWriter<HCDetails> writer = new JpaItemWriter<>();
+		writer.setEntityManagerFactory(emf);
+		return writer;
+	}
+
+	/*
+	 * @Bean public JpaItemWriter<VersionInfo> writer2() {
+	 * JpaItemWriter<VersionInfo> writer = new JpaItemWriter<>();
+	 * writer.setEntityManagerFactory(emf); return writer; }
+	 */
 
 }
