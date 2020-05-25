@@ -21,42 +21,74 @@ public class Portfolio implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	@Column(name="id" )
+	@Column(name="portfolio_id" )
 	@NotNull
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer portfolioId;
 	
 	@Column(name="portfolio_name" )
-	@NotNull
     private String portfolioName;
 
 	@Column(name="portfolio_type" )
-	@NotNull
     private String portfolioType;
+	
+	@Column(name="location" )
+    private String location;
+	
+	@Column(name="sto" )
+    private String sto;
+	
+	@Column(name="lto" )
+    private String lto;
 	
 	@Column(name="brm_empid" )
 	@NotNull
     private Integer brmEmpId;
 	
-	@Column(name="onsite_lead_empid" )
+	@Column(name="brmname" )
+    private String brmName;
+	
+	@Column(name="brmnamehc" )
+    private String brmNameHC;
+	
+	@Column(name="brmnamebilling" )
+    private String brmNameBilling;
+	
+	@Column(name="em_empno" )
 	@NotNull
-    private Integer onsiteLeadEmpId;
+    private Integer emEmpNo;
+	
+	@Column(name="em_name" )
+    private String emName;	
+
+	@Column(name="emnamehc" )
+    private String emNameHc;	
+
+	@Column(name="emnamebilling" )
+    private String emNameBilling;
 	
 	@Column(name="dm_emp_id" )
 	@NotNull
     private Integer dmEmpId;
+		
+	@Column(name="dm_name" )
+    private String dmName;	
+
+	@Column(name="dmnamehc" )
+    private String dmNameHc;	
+
+	@Column(name="dmnamebilling" )
+    private String dmNameBilling;
 	
-	@Column(name="offshore_lead_emp_id" )
+	@Column(name="billing_lead_emp_id" )
 	@NotNull
-    private Integer offshoreLeadEmpId;
+    private Integer billingLeadEmpId;	
 	
-	@Column(name="billing_emp_id" )
-	@NotNull
-    private Integer billingEmpId;
+	@Column(name="billing_lead_name" )
+    private String billingLeadName;	
 	
 	@Column(name="description" )
-	@NotNull
     private Integer description;
 
 	public Integer getPortfolioId() {
@@ -83,6 +115,30 @@ public class Portfolio implements Serializable {
 		this.portfolioType = portfolioType;
 	}
 
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+	public String getSto() {
+		return sto;
+	}
+
+	public void setSto(String sto) {
+		this.sto = sto;
+	}
+
+	public String getLto() {
+		return lto;
+	}
+
+	public void setLto(String lto) {
+		this.lto = lto;
+	}
+
 	public Integer getBrmEmpId() {
 		return brmEmpId;
 	}
@@ -91,12 +147,60 @@ public class Portfolio implements Serializable {
 		this.brmEmpId = brmEmpId;
 	}
 
-	public Integer getOnsiteLeadEmpId() {
-		return onsiteLeadEmpId;
+	public String getBrmName() {
+		return brmName;
 	}
 
-	public void setOnsiteLeadEmpId(Integer onsiteLeadEmpId) {
-		this.onsiteLeadEmpId = onsiteLeadEmpId;
+	public void setBrmName(String brmName) {
+		this.brmName = brmName;
+	}
+
+	public String getBrmNameHC() {
+		return brmNameHC;
+	}
+
+	public void setBrmNameHC(String brmNameHC) {
+		this.brmNameHC = brmNameHC;
+	}
+
+	public String getBrmNameBilling() {
+		return brmNameBilling;
+	}
+
+	public void setBrmNameBilling(String brmNameBilling) {
+		this.brmNameBilling = brmNameBilling;
+	}
+
+	public Integer getEmEmpNo() {
+		return emEmpNo;
+	}
+
+	public void setEmEmpNo(Integer emEmpNo) {
+		this.emEmpNo = emEmpNo;
+	}
+
+	public String getEmName() {
+		return emName;
+	}
+
+	public void setEmName(String emName) {
+		this.emName = emName;
+	}
+
+	public String getEmNameHc() {
+		return emNameHc;
+	}
+
+	public void setEmNameHc(String emNameHc) {
+		this.emNameHc = emNameHc;
+	}
+
+	public String getEmNameBilling() {
+		return emNameBilling;
+	}
+
+	public void setEmNameBilling(String emNameBilling) {
+		this.emNameBilling = emNameBilling;
 	}
 
 	public Integer getDmEmpId() {
@@ -107,20 +211,44 @@ public class Portfolio implements Serializable {
 		this.dmEmpId = dmEmpId;
 	}
 
-	public Integer getOffshoreLeadEmpId() {
-		return offshoreLeadEmpId;
+	public String getDmName() {
+		return dmName;
 	}
 
-	public void setOffshoreLeadEmpId(Integer offshoreLeadEmpId) {
-		this.offshoreLeadEmpId = offshoreLeadEmpId;
+	public void setDmName(String dmName) {
+		this.dmName = dmName;
 	}
 
-	public Integer getBillingEmpId() {
-		return billingEmpId;
+	public String getDmNameHc() {
+		return dmNameHc;
 	}
 
-	public void setBillingEmpId(Integer billingEmpId) {
-		this.billingEmpId = billingEmpId;
+	public void setDmNameHc(String dmNameHc) {
+		this.dmNameHc = dmNameHc;
+	}
+
+	public String getDmNameBilling() {
+		return dmNameBilling;
+	}
+
+	public void setDmNameBilling(String dmNameBilling) {
+		this.dmNameBilling = dmNameBilling;
+	}
+
+	public Integer getBillingLeadEmpId() {
+		return billingLeadEmpId;
+	}
+
+	public void setBillingLeadEmpId(Integer billingLeadEmpId) {
+		this.billingLeadEmpId = billingLeadEmpId;
+	}
+
+	public String getBillingLeadName() {
+		return billingLeadName;
+	}
+
+	public void setBillingLeadName(String billingLeadName) {
+		this.billingLeadName = billingLeadName;
 	}
 
 	public Integer getDescription() {
@@ -131,13 +259,9 @@ public class Portfolio implements Serializable {
 		this.description = description;
 	}
 
-	// 	List<BaseLine> newBaseLineList = getMaxBaseLineDetailsList();
-	//        	
-	//        	if(newBaseLineList == null || newBaseLineList.size() < 1) {
-	//        		throw new InternalError("Something went wrong please try again later.");
-	//        	}
-	//        	
-	//        	return newBaseLineList.get(0);
-	
-	
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+		
 }

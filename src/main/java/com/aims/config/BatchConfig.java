@@ -139,16 +139,21 @@ public class BatchConfig {
 
 		PoiItemReader<Employee> reader = new PoiItemReader<Employee>();
 		PushbackInputStream input = null;
-
+		
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(datasource);
-
+		try {
 		input = new PushbackInputStream(new ByteArrayInputStream(ConfigurationHelper.getHcInter(jdbcTemplate)));
+		}catch(Exception ex) {
+			reader.setRowMapper(excelRowMapper(jdbcTemplate));
+			return reader;
 
+		}
+		reader.setRowMapper(excelRowMapper(jdbcTemplate));
 		InputStreamResource resource = new InputStreamResource(input);
 		reader.setUseDataFormatter(true);
 		reader.setLinesToSkip(1);
 		reader.setResource(resource);
-		reader.setRowMapper(excelRowMapper(jdbcTemplate));
+		
 		reader.setCurrentSheet(1);
 
 		return reader;
