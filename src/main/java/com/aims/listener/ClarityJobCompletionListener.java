@@ -6,25 +6,24 @@ import org.springframework.batch.core.listener.JobExecutionListenerSupport;
 
 import com.aims.dao.BatchDao;
 
-public class BillingJobCompletionListener extends JobExecutionListenerSupport {
-	
+public class ClarityJobCompletionListener extends JobExecutionListenerSupport {	
+
 	private BatchDao dao;
 	
-	public BillingJobCompletionListener(BatchDao dao)
+	public ClarityJobCompletionListener(BatchDao dao)
 	{
 		this.dao=dao;
 	}
-	
-		
-
 	@Override
 	public void afterJob(JobExecution jobExecution) {
 		if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
-			System.out.println("Billing batch job completed successfully");
-			dao.deleteBRIntermediate();
-			System.out.println("BR Intermediate record deleted successfully");
+			System.out.println("Clarity batch job completed successfully");
+			dao.deleteClarityIntermediate();
+			System.out.println("Clarity Intermediate record deleted successfully");
 		}
 	}
 	
 	
+	
+
 }

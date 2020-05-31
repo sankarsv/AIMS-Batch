@@ -25,12 +25,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.aims.bo.BillingDetails;
-import com.aims.helper.ConfigurationHelper;
+import com.aims.dao.BatchDao;
 import com.aims.listener.BillingJobCompletionListener;
-import com.aims.listener.JobCompletionListener;
 import com.aims.mapper.BillingMasterRowMapper;
 import com.aims.mapper.BillingRowMapper;
 import com.aims.model.BillingMaster;
@@ -52,9 +50,11 @@ public class BillingBatchConfig {
 
 	@Autowired
 	private EntityManagerFactory emf;
-
+	
 	@Autowired
-	private DataSource datasource;
+	private DataSource datasource;	
+	
+	private BatchDao dao;
 
 	@Bean
 	public Job processBillingDetailsJob() throws Exception {
@@ -71,7 +71,7 @@ public class BillingBatchConfig {
 	@Bean
 	@Lazy
 	public JobExecutionListener billingListener() {
-		return new BillingJobCompletionListener(datasource);
+		return new BillingJobCompletionListener(getDao() );
 	}
 	
 	@Bean("billingErrorTasklet")
@@ -110,22 +110,22 @@ public class BillingBatchConfig {
 
 		PoiItemReader<BillingDetails> reader = new PoiItemReader<BillingDetails>();
 		PushbackInputStream input = null;
+		InputStreamResource resource = null;
 		try {
 			reader.setRowMapper(billingRowMapper());
+			input = new PushbackInputStream(new ByteArrayInputStream(getDao().getBrInter()));
+			resource = new InputStreamResource(input);
+		} catch (Exception ex) {
+			System.out.println("There was a problem during upload of BillingDetails");
+		}
 
-			JdbcTemplate jdbcTemplate = new JdbcTemplate(datasource);
-
-			input = new PushbackInputStream(new ByteArrayInputStream(ConfigurationHelper.getBrInter(jdbcTemplate)));
-
-			InputStreamResource resource = new InputStreamResource(input);
+			
 			reader.setUseDataFormatter(true);
 			reader.setLinesToSkip(2);
 			reader.setResource(resource);
 			reader.setCurrentSheet(0);
 
-		} catch (Exception ex) {
-			System.out.println("Upload file is of not of type head count report");
-		}
+		
 
 		return reader;
 	}
@@ -138,12 +138,15 @@ public class BillingBatchConfig {
 		PoiItemReader<BillingDetails> reader = new PoiItemReader<BillingDetails>();
 		reader.setRowMapper(billingMasterRowMapper());
 		PushbackInputStream input = null;
-
-		JdbcTemplate jdbcTemplate = new JdbcTemplate(datasource);
-
-		input = new PushbackInputStream(new ByteArrayInputStream(ConfigurationHelper.getBrInter(jdbcTemplate)));
-
-		InputStreamResource resource = new InputStreamResource(input);
+		InputStreamResource resource = null;
+		
+		try {
+		input = new PushbackInputStream(new ByteArrayInputStream(getDao().getBrInter()));
+		resource = new InputStreamResource(input);
+		}catch (Exception ex) {
+			System.out.println("There was a problem during upload of BillingDetails");
+		}
+		
 		reader.setUseDataFormatter(true);
 		reader.setLinesToSkip(2);
 		reader.setResource(resource);
@@ -166,14 +169,14 @@ public class BillingBatchConfig {
 	@Bean
 	@StepScope
 	public ItemProcessor<BillingDetails, BillingVersion> billVersionprocessor() {
-		return new ProcessBillingVersionBuild(datasource);
+		return new ProcessBillingVersionBuild(getDao());
 
 	}
 
 	@Bean
 	@StepScope
 	public ItemProcessor<BillingDetails, BillingMaster> billMasterProcessor() {
-		return new ProcessBillingMasterBuild(datasource);
+		return new ProcessBillingMasterBuild(getDao());
 
 	}
 
@@ -183,6 +186,13 @@ public class BillingBatchConfig {
 		JpaItemWriter<BillingMaster> writer = new JpaItemWriter<>();
 		writer.setEntityManagerFactory(emf);
 		return writer;
+	}
+	
+	private BatchDao getDao() {
+		if(dao==null) {
+			dao = new BatchDao(datasource);
+		}
+		return dao;
 	}
 
 }

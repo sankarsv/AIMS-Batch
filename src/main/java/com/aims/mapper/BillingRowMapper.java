@@ -25,6 +25,7 @@ public class BillingRowMapper implements RowMapper<BillingDetails> {
 		}
 
 		details.setBrm(rs.getColumnValue(0));
+		details.setOnsiteOffshore(rs.getColumnValue(2));
 
 		LocalDate currentDate = LocalDate.now();
 

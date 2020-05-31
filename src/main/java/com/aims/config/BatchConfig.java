@@ -2,10 +2,6 @@ package com.aims.config;
 
 import java.io.ByteArrayInputStream;
 import java.io.PushbackInputStream;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
@@ -21,23 +17,18 @@ import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.listener.ExecutionContextPromotionListener;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.excel.RowMapper;
 import org.springframework.batch.item.excel.poi.PoiItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementSetter;
 
 import com.aims.bo.Employee;
-import com.aims.helper.ConfigurationHelper;
+import com.aims.dao.BatchDao;
 import com.aims.helperinterface.BatchToOnlineTriggerhelperInterface;
 import com.aims.listener.JobCompletionListener;
 import com.aims.mapper.EmployeeRowMapper;
@@ -49,7 +40,11 @@ import com.aims.tasklet.HCChildSaveTasklet;
 
 @Configuration
 public class BatchConfig {
-
+	
+	
+	@Autowired
+	private DataSource datasource;
+	
 	@Autowired
 	public JobBuilderFactory jobBuilderFactory;
 
@@ -61,10 +56,9 @@ public class BatchConfig {
 
 	@Autowired
 	BatchToOnlineTriggerhelperInterface batchtoOnlineInt;
-
-	@Autowired
-	private DataSource datasource;
-
+	
+	private BatchDao dao;
+	
 	@Bean
 	public Job processHeadCountJob() throws Exception {
 		return jobBuilderFactory.get("processHeadCountJob").incrementer(new RunIdIncrementer()).listener(listener())
@@ -79,7 +73,7 @@ public class BatchConfig {
 	//.next(performHCChildTableSave())
 	@Bean("hcversionsave")
 	public Step performHCVersionSave() {
-		return stepBuilderFactory.get("performVersionSave").tasklet(new DbWriteTasklet(datasource))
+		return stepBuilderFactory.get("performVersionSave").tasklet(new DbWriteTasklet(getDao()))
 				.listener(promotionListener()).build();
 	}
 
@@ -130,7 +124,7 @@ public class BatchConfig {
 	@Bean
 	@Lazy
 	public JobExecutionListener listener() {
-		return new JobCompletionListener(datasource);
+		return new JobCompletionListener(getDao());
 	}
 
 	@Bean
@@ -138,17 +132,15 @@ public class BatchConfig {
 	ItemReader<Employee> excelStudentReader() throws Exception {
 
 		PoiItemReader<Employee> reader = new PoiItemReader<Employee>();
-		PushbackInputStream input = null;
+		PushbackInputStream input = null;		
 		
-		JdbcTemplate jdbcTemplate = new JdbcTemplate(datasource);
 		try {
-		input = new PushbackInputStream(new ByteArrayInputStream(ConfigurationHelper.getHcInter(jdbcTemplate)));
+		input = new PushbackInputStream(new ByteArrayInputStream(getDao().getHcInter()));
 		}catch(Exception ex) {
-			reader.setRowMapper(excelRowMapper(jdbcTemplate));
+			reader.setRowMapper(excelRowMapper());
 			return reader;
-
 		}
-		reader.setRowMapper(excelRowMapper(jdbcTemplate));
+		reader.setRowMapper(excelRowMapper());
 		InputStreamResource resource = new InputStreamResource(input);
 		reader.setUseDataFormatter(true);
 		reader.setLinesToSkip(1);
@@ -159,7 +151,7 @@ public class BatchConfig {
 		return reader;
 	}
 
-	@Bean
+	/*@Bean
 	@StepScope
 	JdbcCursorItemReader<HCDetails> databaseItemReader(@Value("#{jobExecutionContext[versionNo]}") int version) {
 		Map<String, Object> namedParameters = new HashMap<String, Object>() {
@@ -168,7 +160,6 @@ public class BatchConfig {
 			}
 		};
 		JdbcCursorItemReader<HCDetails> databaseReader = new JdbcCursorItemReader<>();
-		databaseReader.setDataSource(datasource);
 		databaseReader.setSql("SELECT * FROM aims.hcmaster where version_no= ?");
 		databaseReader.setPreparedStatementSetter(new PreparedStatementSetter() {
 
@@ -178,11 +169,11 @@ public class BatchConfig {
 		});
 		databaseReader.setRowMapper(new BeanPropertyRowMapper<>(HCDetails.class));
 		return databaseReader;
-	}
+	}*/
 
-	private RowMapper<Employee> excelRowMapper(JdbcTemplate jdbcTemplate) {
+	private RowMapper<Employee> excelRowMapper() {
 
-		return new EmployeeRowMapper(jdbcTemplate);
+		return new EmployeeRowMapper(getDao());
 	}
 
 	@Bean
@@ -203,6 +194,13 @@ public class BatchConfig {
 		JpaItemWriter<HCDetails> writer = new JpaItemWriter<>();
 		writer.setEntityManagerFactory(emf);
 		return writer;
+	}
+	
+	private BatchDao getDao() {
+		if(dao==null) {
+			dao = new BatchDao(datasource);
+		}
+		return dao;
 	}
 
 	/*

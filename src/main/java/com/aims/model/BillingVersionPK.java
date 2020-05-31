@@ -5,20 +5,25 @@ import java.io.Serializable;
 public class BillingVersionPK implements Serializable{
 
 
-	protected String brmRef;
+	protected String brmEmpNo;
 	
 	protected String month;
+	
+	protected String location;
 	
 	protected int year;
 	
 	public BillingVersionPK() {
 	}
 
-	public BillingVersionPK(String brmRef, String month, int year) {
+	public BillingVersionPK(String brmEmpNo, String month, int year, String location) {
 		
-		this.brmRef =brmRef;
+		this.brmEmpNo =brmEmpNo;
 		this.month=month;
 		this.year = year;
+		this.location=location;
 	}
+	
+	
 
 }

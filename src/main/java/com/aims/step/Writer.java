@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.batch.item.ItemWriter;
 
+import com.aims.model.BillingMaster;
 import com.aims.model.BillingVersion;
 
 public class Writer implements ItemWriter<BillingVersion> {
@@ -13,5 +14,7 @@ public class Writer implements ItemWriter<BillingVersion> {
 		
 		
 	}
+	
 
 }
+

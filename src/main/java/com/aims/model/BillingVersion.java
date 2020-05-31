@@ -23,8 +23,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class BillingVersion implements Serializable{
 
 	@Id
-	@Column(name = "BRM")
-	private String brmRef;
+	@Column(name = "BRM_EMPNO")
+	private String brmEmpNo;
 	
 	@Id
 	@Column(name = "PERIODMONTH")
@@ -34,26 +34,36 @@ public class BillingVersion implements Serializable{
 	@Column(name = "YEAR")
 	private int year;
 	
-	@Column(name = "VERSION")		
-	@GenericGenerator(name = "sequence", strategy = "sequence", parameters = {
+	@Id
+	@Column(name = "LOCATION")
+	private String location;
+	
+			
+	/*@GenericGenerator(name = "sequence", strategy = "sequence", parameters = {
             @org.hibernate.annotations.Parameter(name = "sequenceName", value = "aims.SEQ_BILL_VERSION"),
             @org.hibernate.annotations.Parameter(name = "allocationSize", value = "1"),
     })
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequence")
-    //@SequenceGenerator(sequenceName = "aims.SEQ_BILL_VERSION", allocationSize = 1, name = "CUST_SEQ")   
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequence")*/
+    //@SequenceGenerator(sequenceName = "aims.SEQ_BILL_VERSION", allocationSize = 1, name = "CUST_SEQ")
+	@Column(name = "VERSION")
 	private int versionNo;
 	
 	@Column(name = "FREEZEIND")
 	private String freezeInd;
+	
+	@Column(name = "DRAFTINDICATOR")
+	private String draftInd;
 
-	public String getBrmRef() {	
-		return brmRef;
-	}
+	@Column(name = "BILLINGCOMMENTS")
+	private String billingComments;
+	
+	@Column(name = "CLARITYVERSION")
+	private int clarityVersion;
+	
+	@Column(name = "DISCREPANCYVERSION")
+	private int discrepancyVersion;
 
-	public void setBrmRef(String brmRef) {
-		this.brmRef = brmRef;
-	}
-
+	
 	public String getMonth() {
 		return month;
 	}
@@ -86,6 +96,54 @@ public class BillingVersion implements Serializable{
 
 	public void setFreezeInd(String freezeInd) {
 		this.freezeInd = freezeInd;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+	public String getBrmEmpNo() {
+		return brmEmpNo;
+	}
+
+	public void setBrmEmpNo(String brmEmpNo) {
+		this.brmEmpNo = brmEmpNo;
+	}
+
+	public String getDraftInd() {
+		return draftInd;
+	}
+
+	public void setDraftInd(String draftInd) {
+		this.draftInd = draftInd;
+	}
+
+	public String getBillingComments() {
+		return billingComments;
+	}
+
+	public void setBillingComments(String billingComments) {
+		this.billingComments = billingComments;
+	}
+
+	public int getClarityVersion() {
+		return clarityVersion;
+	}
+
+	public void setClarityVersion(int clarityVersion) {
+		this.clarityVersion = clarityVersion;
+	}
+
+	public int getDiscrepancyVersion() {
+		return discrepancyVersion;
+	}
+
+	public void setDiscrepancyVersion(int discrepancyVersion) {
+		this.discrepancyVersion = discrepancyVersion;
 	}
 	
 }

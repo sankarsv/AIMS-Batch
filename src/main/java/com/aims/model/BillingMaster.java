@@ -27,14 +27,14 @@ public class BillingMaster implements Serializable {
 	@Column(name = "DMNAME")
 	private String dmName;
 	
-	@Column(name="BRMNAME")
+	/*@Column(name="BRMNAME")
 	private String brmName;
 	
 	@Column(name="EMPLOYEE_NAME")
 	private String empName;
 	
 	@Column(name="OFFICEID")
-	private String officeId;
+	private String officeId;*/
 
 	@Column(name = "WON")
 	private String wonNumber;
@@ -181,7 +181,7 @@ public class BillingMaster implements Serializable {
 		this.remarks2 = remarks2;
 	}
 
-	public String getBrmName() {
+	/*public String getBrmName() {
 		return brmName;
 	}
 
@@ -203,5 +203,5 @@ public class BillingMaster implements Serializable {
 
 	public void setOfficeId(String officeId) {
 		this.officeId = officeId;
-	}
+	}*/
 }

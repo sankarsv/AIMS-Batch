@@ -4,60 +4,88 @@ import java.time.LocalDate;
 
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Component;
 
 import com.aims.bo.BillingDetails;
+import com.aims.model.BRIntermediate;
 import com.aims.model.BillingMaster;
 import com.aims.model.BillingVersion;
+import com.aims.model.ClarityIntermediate;
+import com.aims.model.ClarityMaster;
+import com.aims.model.HCIntermediate;
+
 
 public class BatchDao {
 	
-	private String sqlUpdate = "UPDATE aims.hcversion set current_ind = :ind where current_ind = :indold";
+	private static String sql = "select MAX(upload_time) as upload_time,filedata from aims.hc_intermediate group by filedata";
+
+	private static String brSql = "select MAX(upload_time) as upload_time,filedata,file_id from aims.br_intermediate group by filedata,file_id";
 	
-	private String deleteHCIntermediate = "delete from aims.hc_intermediate";
+	private static String claritySql = "select MAX(upload_time) as upload_time,filedata,file_id from aims.clarity_intermediate group by filedata,file_id";
 	
-	private String deleteBRIntermediate = "delete from aims.br_intermediate";
+	private static String sqlUpdate = "UPDATE aims.hcversion set current_ind = :ind where current_ind = :indold";
 	
-	private String sqlWrite = "INSERT INTO aims.hcversion(version_no,load_date, description, current_ind)"
+	private static String clarityVersionsql = " select nextval('aims.seq_clarity_version')";
+	
+	private static String clarityVersionUpdateSql = "UPDATE aims.billingversion SET CLARITYVERSION= :version where periodmonth = :month and year = :year";
+	
+	private static String deleteHCIntermediate = "delete from aims.hc_intermediate";
+	
+	private static String deleteBRIntermediate = "delete from aims.br_intermediate";
+	
+	private static String deleteClarityIntermediate = "delete from aims.clarity_intermediate";
+	
+	private static String sqlWrite = "INSERT INTO aims.hcversion(version_no,load_date, description, current_ind)"
 			+ "	VALUES (nextval('aims.seq_version_no'), :loadDate, :desc, :curr)";
 	
-	private String sqlBillingVersionWrite = "INSERT INTO aims.billingversion (brm, periodmonth, year, version, freezeind)"
-			+ "	VALUES (:brm, :month, :year, nextval('aims.seq_bill_version'), :freeze)";
+	private static String sqlBillingVersionWrite = "INSERT INTO aims.billingversion (brm_empno, periodmonth, year, version, freezeind, location)"
+			+ "	VALUES (:brm_empno, :month, :year, nextval('aims.seq_bill_version'), :freeze, :location)";
 	
 	private String sqlBillRateUpdate ="UPDATE aims.billrate set billrate = :billrate where billing_employee_id = :empid";
 	
-	private String sqlBillMasterUpdate ="UPDATE aims.billingmaster set dmname = :dmname, won= :won, onsite_offshore=:onof, sto=:sto, billablehours=:billablehours,"
+	//brmname=:brmname,officeid=:officeid,employee_name=:empname
+	private static String sqlBillMasterUpdate ="UPDATE aims.billingmaster set dmname = :dmname, won= :won, onsite_offshore=:onof, sto=:sto, billablehours=:billablehours,"
 			+ " billabledays=:billabledays, effort=:effort, extrahours=:extrahours, extrabilling=:extrabilling, billableamount=:billableamount,"
-			+ " remarks1=:remarks1,remarks2=:remarks2, brmname=:brmname,officeid=:officeid,employee_name=:empname where employee_id = :empid and version=:version";
+			+ " remarks1=:remarks1,remarks2=:remarks2 where employee_id = :empid and version=:version";
 	
-	private String sqlBillRateInsert ="INSERT INTO aims.billrate(billing_employee_id, billrate, currencr, enddate, startdate, billing_version) "
+	private static String sqlBillRateInsert ="INSERT INTO aims.billrate(billing_employee_id, billrate, currencr, enddate, startdate, billing_version) "
 			+ "VALUES (:empid, :billrate, :currency, :enddate, :startdate, :version)";
 	
-	private String sqlBillMasterInsert ="INSERT INTO aims.billingmaster(version, employee_id, dmname, won, onsite_offshore, sto, billablehours, billabledays, effort, extrahours, "
-			+ "extrabilling, billableamount, remarks1, remarks2, brmname, officeid, employee_name) "
-			+ "VALUES (:version, :empid, :dmname, :won, :onsiteoffshore, :sto, :billablehrs, :billabledays, :effort, :extrahours, :extrabilling, :billableamount, :remarks1, :remarks2"
-			+ ", :brm, :officeid, :empname)";
+	private static String sqlClarityMasterInsert ="INSERT INTO aims.claritymaster(clarity_id, version, transactionclass, cccio, resourcemanager, timesheetdepartment, lastnamefirstname, resourceid, officeid, cin, sumofhours, averagerate, ratewithouttax) "
+			+ "VALUES (nextval('aims.seq_clarity_id'), :version, :transactionclass, :cccio, :resourcemanager, :timesheetdepartment, :lastnamefirstname, :resourceid, :officeid, :cin, :sumofhours, :averagerate, :ratewithouttax)";
 	
-	String sretrieveSql = "SELECT version_no FROM aims.hcversion WHERE current_ind = ?";
+	private static String sqlBillMasterInsert ="INSERT INTO aims.billingmaster(version, employee_id, dmname, won, onsite_offshore, sto, billablehours, billabledays, effort, extrahours, "
+			+ "extrabilling, billableamount, remarks1, remarks2) "
+			+ "VALUES (:version, :empid, :dmname, :won, :onsiteoffshore, :sto, :billablehrs, :billabledays, :effort, :extrahours, :extrabilling, :billableamount, :remarks1, :remarks2)";
+			
 	
-	String checkIfbillingVersionSql = "SELECT version FROM aims.billingversion WHERE brm = ? and year =? and periodmonth=?";
+	private static String sretrieveSql = "SELECT version_no FROM aims.hcversion WHERE current_ind = ?";
 	
-	String retrieveBillingVersionSql = "select version from aims.billingversion WHERE brm = ? and periodmonth=? and year =?";
+	private static String retrieveBrmEmpId= "SELECT brm_empid FROM aims.portfolio WHERE brmname = ?";
+	
+	private static String retrieveclarityVersSql= "SELECT distinct clarityversion from aims.billingversion where periodmonth=? and year=?";
+	
+	private static String checkIfbillingVersionSql = "SELECT version FROM aims.billingversion WHERE brm_empno = ? and year =? and periodmonth=? and location=?";
+	
+	private static String retrieveBillingVersionSql = "select version from aims.billingversion WHERE brm_empno = ? and periodmonth=? and year =? and location=?";
 	
 	private NamedParameterJdbcTemplate myJDBC = null;
 	
-	private JdbcTemplate jdbcTemplate = null; 
-	
-	public BatchDao(DataSource datasource)
+	private JdbcTemplate jdbcTemplate = null; 	
+		
+	public BatchDao(DataSource ds)
 	{
-		myJDBC= new NamedParameterJdbcTemplate(datasource);
-		jdbcTemplate = new JdbcTemplate(datasource);
+		myJDBC= new NamedParameterJdbcTemplate(ds);
+		jdbcTemplate = new JdbcTemplate(ds);		
 	}
 	
 	public void updateHCVersion(KeyHolder holder)
@@ -66,6 +94,21 @@ public class BatchDao {
 		SqlParameterSource parameters = new MapSqlParameterSource().addValue("ind", "N")
 				.addValue("indold", "Y");;
 		myJDBC.update(sqlUpdate, parameters, holder);
+	}
+	
+	public void updateClarityVersion(KeyHolder holder,String month,int year) {
+		
+		System.out.println("month of carity version" +month);
+		
+		System.out.println("year of carity version" +year);
+		
+		SqlParameterSource parameters = new MapSqlParameterSource().addValue("version", retrieveClarityVersionFromDual()).addValue("month", month)
+				
+				.addValue("year", year);
+		
+		int value=myJDBC.update(clarityVersionUpdateSql, parameters, holder);		
+		//, new Object[] {month,year});
+		System.out.println("update count of carity version" +value);
 	}
 	
 	public void insertHCVersion(KeyHolder holder)
@@ -84,17 +127,40 @@ public class BatchDao {
 		KeyHolder holder = new GeneratedKeyHolder();
 		SqlParameterSource insParam = new MapSqlParameterSource()
 				
-				.addValue("brm", bv.getBrmRef())
+				.addValue("brm_empno", bv.getBrmEmpNo())
 				.addValue("month", bv.getMonth())
 				.addValue("year", bv.getYear())
-				.addValue("freeze", bv.getFreezeInd());
+				.addValue("freeze", bv.getFreezeInd())
+				.addValue("location", bv.getLocation());
+
 		myJDBC.update(sqlBillingVersionWrite, insParam, holder);
+	}
+	
+	public void insertClarityMaster(ClarityMaster cm)
+	{
+		KeyHolder holder = new GeneratedKeyHolder();
+		SqlParameterSource insParam = new MapSqlParameterSource()
+		//:version, :transactionclass, :resourcemanager, :timesheetdepartment, :lastnamefirstname, :resourceid, :officeid, :cin, :sumofhours, :averagerate, :ratewithouttax)";
+				.addValue("version", cm.getVersion())
+				.addValue("transactionclass", cm.getTransactionClass())
+				.addValue("cccio", cm.getCccio())
+				.addValue("resourcemanager", cm.getResourceManager())
+				.addValue("timesheetdepartment", cm.getTimesheetDept())
+				.addValue("lastnamefirstname", cm.getFullName())
+				.addValue("resourceid", cm.getResourceId())
+				.addValue("officeid", cm.getOfficeId())
+				.addValue("cin", cm.getCin())
+				.addValue("sumofhours", cm.getSumOfHrs())
+				.addValue("averagerate", cm.getAvgRate())
+				.addValue("ratewithouttax", cm.getRateWoTax());
+
+		myJDBC.update(sqlClarityMasterInsert, insParam, holder);
 	}
 	
 	public boolean checkBillingVersionExist(BillingVersion bv) {
 		try {
 			jdbcTemplate.queryForObject(checkIfbillingVersionSql,
-					new Object[] { bv.getBrmRef(), bv.getYear(), bv.getMonth() }, Integer.class);
+					new Object[] { bv.getBrmEmpNo(), bv.getYear(), bv.getMonth(), bv.getLocation() }, Integer.class);
 		} catch (EmptyResultDataAccessException ex) {
 			return false;
 		}
@@ -102,18 +168,34 @@ public class BatchDao {
 		return true;
 	}
 	
+	private Integer retrieveClarityVersionFromDual()
+	{
+		return (Integer) jdbcTemplate.queryForObject(clarityVersionsql, new Object[] {}, Integer.class);
+	}
+	
+	
 	public Integer retrieveHCVersion()
 	{
 		return (Integer) jdbcTemplate.queryForObject(sretrieveSql, new Object[] {"Y"}, Integer.class);
 	}
 	
-	public Integer retrieveBillingVersion(BillingDetails bd)
+	public Integer retrieveclarityVersion(String month,int year)
+	{
+		return (Integer) jdbcTemplate.queryForObject(retrieveclarityVersSql, new Object[] {month,year}, Integer.class);
+	}
+	
+	public Integer retrievebrmEmpId(String name)
+	{
+		return (Integer) jdbcTemplate.queryForObject(retrieveBrmEmpId, new Object[] {name}, Integer.class);
+	}
+	
+	public Integer retrieveBillingVersion(BillingDetails bd,String brmEmpId)
 	{
 		LocalDate currentDate = LocalDate.now();
 
 		String month =currentDate.getMonth().toString();
 		int year = currentDate.getYear();
-		return (Integer) jdbcTemplate.queryForObject(retrieveBillingVersionSql,new Object[] {bd.getBrm(),month,year},Integer.class);
+		return (Integer) jdbcTemplate.queryForObject(retrieveBillingVersionSql,new Object[] {brmEmpId,month,year,bd.getOnsiteOffshore()},Integer.class);
 	}
 	
 	public int upDateBillRate(KeyHolder holder,BillingDetails bd)
@@ -133,6 +215,11 @@ public class BatchDao {
 		return myJDBC.update(deleteBRIntermediate, new MapSqlParameterSource());
 	}
 	
+	public int deleteClarityIntermediate()
+	{		
+		return myJDBC.update(deleteClarityIntermediate, new MapSqlParameterSource());
+	}
+	
 	public int upDateBillMaster(KeyHolder holder,BillingMaster bd)
 	{	
 		SqlParameterSource parameters = new MapSqlParameterSource()
@@ -141,8 +228,9 @@ public class BatchDao {
 				.addValue("billablehours", bd.getBillablehrs()).addValue("billabledays", bd.getBillableDays())
 				.addValue("effort", bd.getEffort()).addValue("extrahours", bd.getExtraHours()).addValue("extrabilling", bd.getExtraBilling())
 				.addValue("billableamount", bd.getBillableAmount()).addValue("remarks1", bd.getRemarks1())
-				.addValue("remarks2", bd.getRemarks2()).addValue("brmname", bd.getBrmName()).addValue("officeid", bd.getOfficeId())
-				.addValue("empname", bd.getEmpName()).addValue("empid", bd.getEmpId()).addValue("version", bd.getVersionNo());
+				.addValue("remarks2", bd.getRemarks2()).addValue("empid", bd.getEmpId()).addValue("version", bd.getVersionNo());
+		
+		//.addValue("brmname", bd.getBrmName()).addValue("officeid", bd.getOfficeId()).addValue("empname", bd.getEmpName())
 		return myJDBC.update(sqlBillMasterUpdate, parameters, holder);
 	}
 
@@ -164,9 +252,28 @@ public class BatchDao {
 				.addValue("billablehrs", bd.getBillablehrs()).addValue("billabledays", bd.getBillableDays())
 				.addValue("effort", bd.getEffort()).addValue("extrahours", bd.getExtraHours()).addValue("extrabilling", bd.getExtraBilling())
 				.addValue("billableamount", bd.getBillableAmount()).addValue("remarks1", bd.getRemarks1())
-				.addValue("remarks2", bd.getRemarks2()).addValue("brm", bd.getBrmName()).addValue("officeid", bd.getOfficeId())
-				.addValue("empname", bd.getEmpName());
+				.addValue("remarks2", bd.getRemarks2());
+		//.addValue("brm", bd.getBrmName()).addValue("officeid", bd.getOfficeId()).addValue("empname", bd.getEmpName());
 		myJDBC.update(sqlBillMasterInsert, parameters, holder);
+	}
+	
+	public  byte[] getHcInter() {
+		HCIntermediate inter = jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(HCIntermediate.class));
+		return inter.getFiledata();
+	}
+	
+	public  byte[] getClarityInter() {
+		ClarityIntermediate inter = jdbcTemplate.queryForObject(claritySql, new BeanPropertyRowMapper<>(ClarityIntermediate.class));
+		return inter.getFiledata();
+	}
+
+	public  byte[] getBrInter() {
+		BRIntermediate inter = jdbcTemplate.queryForObject(brSql, new BeanPropertyRowMapper<>(BRIntermediate.class));
+		return inter.getFiledata();
+	}
+
+	public Integer getVersionNo() {
+		return (Integer) jdbcTemplate.queryForObject(sretrieveSql, new Object[] { "Y" }, Integer.class);
 	}
 
 

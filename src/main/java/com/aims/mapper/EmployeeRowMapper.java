@@ -2,10 +2,10 @@ package com.aims.mapper;
 
 import org.springframework.batch.item.excel.RowMapper;
 import org.springframework.batch.item.excel.support.rowset.RowSet;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.aims.bo.Employee;
-import com.aims.helper.ConfigurationHelper;
+import com.aims.dao.BatchDao;
 
 public class EmployeeRowMapper implements RowMapper<Employee> {
 	
@@ -13,15 +13,14 @@ public class EmployeeRowMapper implements RowMapper<Employee> {
 	
 	private boolean isVersionSet = false;
 	
-	private JdbcTemplate jdbcTemplate = null;
+	private BatchDao dao;
 	
-	public EmployeeRowMapper(JdbcTemplate jdbcTemp)
+	public EmployeeRowMapper(BatchDao dao)
 	{
-		this.jdbcTemplate = jdbcTemp;
+		this.dao=dao;
 	}
 	
-	
-	
+		
 	@Override
 	public Employee mapRow(RowSet rs) throws Exception {
 		
@@ -31,7 +30,7 @@ public class EmployeeRowMapper implements RowMapper<Employee> {
 		
 		if(!isVersionSet)
 		{
-			versionNo = ConfigurationHelper.getVersionNo(jdbcTemplate);
+			versionNo = dao.getVersionNo();
 			isVersionSet = true;
 		}
 		Employee emp = new Employee();
