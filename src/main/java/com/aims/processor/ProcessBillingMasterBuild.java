@@ -32,6 +32,8 @@ public class ProcessBillingMasterBuild implements ItemProcessor<BillingDetails, 
 		mapBillingMaster(details, mas,billingVersion);
 
 		KeyHolder holder = new GeneratedKeyHolder();
+		
+		int retVal = dao.saveEmployeeOfficeId(holder,details.getOfficeId(),details.getEmpId());
 
 		if (dao.upDateBillMaster(holder, mas) == 0 ){
 		

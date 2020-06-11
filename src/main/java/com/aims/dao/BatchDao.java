@@ -4,7 +4,6 @@ import java.time.LocalDate;
 
 import javax.sql.DataSource;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -13,7 +12,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.stereotype.Component;
 
 import com.aims.bo.BillingDetails;
 import com.aims.model.BRIntermediate;
@@ -37,6 +35,8 @@ public class BatchDao {
 	private static String clarityVersionsql = " select nextval('aims.seq_clarity_version')";
 	
 	private static String clarityVersionUpdateSql = "UPDATE aims.billingversion SET CLARITYVERSION= :version where periodmonth = :month and year = :year";
+	
+	private static String employeeOfficeIdUpdateSql = "UPDATE aims.employee SET office_id= :officeId where employee_id = :employeeId";
 	
 	private static String deleteHCIntermediate = "delete from aims.hc_intermediate";
 	
@@ -71,6 +71,8 @@ public class BatchDao {
 	private static String sretrieveSql = "SELECT version_no FROM aims.hcversion WHERE current_ind = ?";
 	
 	private static String retrieveBrmEmpId= "SELECT brm_empid FROM aims.portfolio WHERE brmname = ?";
+	
+	private static String retrieveDmId= "SELECT dm_emp_id FROM aims.portfolio WHERE dm_name = ?";
 	
 	private static String retrieveclarityVersSql= "SELECT distinct clarityversion from aims.billingversion where periodmonth=? and year=?";
 	
@@ -109,6 +111,16 @@ public class BatchDao {
 		int value=myJDBC.update(clarityVersionUpdateSql, parameters, holder);		
 		//, new Object[] {month,year});
 		System.out.println("update count of carity version" +value);
+	}
+	
+	public int saveEmployeeOfficeId(KeyHolder holder, String officeId, String empId) {
+
+		SqlParameterSource parameters = new MapSqlParameterSource().addValue("officeId", officeId)
+
+				.addValue("employeeId", Integer.parseInt(empId));
+
+		return myJDBC.update(employeeOfficeIdUpdateSql, parameters, holder);
+
 	}
 	
 	public void insertHCVersion(KeyHolder holder)
@@ -186,7 +198,20 @@ public class BatchDao {
 	
 	public Integer retrievebrmEmpId(String name)
 	{
+		try {
 		return (Integer) jdbcTemplate.queryForObject(retrieveBrmEmpId, new Object[] {name}, Integer.class);
+		}catch (EmptyResultDataAccessException ex) {
+			return 0;
+		}
+	}
+	
+	public Integer retrieveDmEmpId(String name)
+	{
+		try {
+		return (Integer) jdbcTemplate.queryForObject(retrieveDmId, new Object[] {name}, Integer.class);
+		}catch (EmptyResultDataAccessException ex) {
+			return 0;
+		}
 	}
 	
 	public Integer retrieveBillingVersion(BillingDetails bd,String brmEmpId)

@@ -6,9 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.aims.dao.BatchDao;
 import com.aims.helperinterface.BatchToOnlineTriggerhelperInterface;
 import com.aims.model.AllocationPk;
 import com.aims.model.Employee;
@@ -34,6 +37,11 @@ public class BatchToOnlineTriggerhelperImpl implements BatchToOnlineTriggerhelpe
 
 	@Autowired
 	private EmployeeAllocationService employeeAllocationService;
+	
+	@Autowired
+	DataSource datasource;
+	
+	private BatchDao dao;
 
 	@Override
 	public void populateOnlineData() {
@@ -192,9 +200,12 @@ public class BatchToOnlineTriggerhelperImpl implements BatchToOnlineTriggerhelpe
 				// employee.setJoiningDate(tempHCDtl.getDoj()); - Type conversion issue
 				// employee.setPreviousExperience(tempHCDtl.);
 				// employee.setTotalExperience(tempHCDtl.getTotExp()); - Type conversion issue
-				employee.setBrm(tempHCDtl.getBrm());
+				Integer brmId = getDao().retrievebrmEmpId(tempHCDtl.getBrm());
+				employee.setBrm(brmId.toString());
 				// employee.setEm(tempHCDtl.);
-				employee.setDm(tempHCDtl.getDm());
+				
+				Integer dmId = getDao().retrieveDmEmpId(tempHCDtl.getDm());
+				employee.setDm(dmId.toString());
 				employee.setDeputeBranch(tempHCDtl.getDeupteBranch());
 				employee.setDeputeDc(tempHCDtl.getDeputeDC());
 				employee.setEmployeeLocation(tempHCDtl.getEmployeeLocation());
@@ -246,7 +257,7 @@ public class BatchToOnlineTriggerhelperImpl implements BatchToOnlineTriggerhelpe
 				project.setIp(tempHCDtl.getIp());
 				project.setSp(tempHCDtl.getSp());
 				project.setSubsp(tempHCDtl.getSubSP());
-				project.setBrm(tempHCDtl.getBrm());
+				project.setBrm(brmId.toString());
 				project.setGl(tempHCDtl.getGl());
 				project.setAmid(tempHCDtl.getAmID());
 				project.setAm(tempHCDtl.getAm());
@@ -331,6 +342,15 @@ public class BatchToOnlineTriggerhelperImpl implements BatchToOnlineTriggerhelpe
 
 		}
 
+	}
+	
+	private BatchDao getDao()
+	{
+		if(dao==null) {
+			dao = new BatchDao(datasource); 
+		}
+		
+		return dao;
 	}
 
 }
