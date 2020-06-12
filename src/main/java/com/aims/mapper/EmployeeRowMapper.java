@@ -68,42 +68,42 @@ public class EmployeeRowMapper implements RowMapper<Employee> {
 		emp.setEmpId(rs.getColumnValue(25));
 		emp.setEmployeeName(rs.getColumnValue(26));
 
-		emp.setBrmEmName(rs.getColumnValue(27));		
-		emp.setDm(rs.getColumnValue(28));
-		emp.setExpat(rs.getColumnValue(29));
+		emp.setBrmEmName(rs.getColumnValue(27));
+		emp.setDm(rs.getColumnValue(29));
+		emp.setExpat(rs.getColumnValue(30));
 		
-		emp.setDoj(rs.getColumnValue(30));
-		emp.setDeputeBranch(rs.getColumnValue(31));
-		emp.setDeputeDC(rs.getColumnValue(32));
-		emp.setEmployeeLocation(rs.getColumnValue(33));
-		emp.setEmployeeBaseCountry(rs.getColumnValue(34));
-		emp.setBaseBranch(rs.getColumnValue(35));
-		emp.setBaseDC(rs.getColumnValue(36));
-		emp.setEmployeeTravelCountry(rs.getColumnValue(37));
+		emp.setDoj(rs.getColumnValue(31));
+		emp.setDeputeBranch(rs.getColumnValue(32));
+		emp.setDeputeDC(rs.getColumnValue(33));
+		emp.setEmployeeLocation(rs.getColumnValue(34));
+		emp.setEmployeeBaseCountry(rs.getColumnValue(35));
+		emp.setBaseBranch(rs.getColumnValue(36));
+		emp.setBaseDC(rs.getColumnValue(37));
+		emp.setEmployeeTravelCountry(rs.getColumnValue(38));
 		
-		emp.setTravelType(rs.getColumnValue(38));
-		emp.setDesignation(rs.getColumnValue(39));
-		emp.setGrade(rs.getColumnValue(40));
-		emp.setMappDesignation(rs.getColumnValue(41));
-		emp.setSeniorJunior(rs.getColumnValue(42));
-		emp.setCCNonCC(rs.getColumnValue(43));
-		emp.setPersonType(rs.getColumnValue(44));
+		emp.setTravelType(rs.getColumnValue(39));
+		emp.setDesignation(rs.getColumnValue(40));
+		emp.setGrade(rs.getColumnValue(41));
+		emp.setMappDesignation(rs.getColumnValue(42));
+		emp.setSeniorJunior(rs.getColumnValue(43));
+		emp.setCCNonCC(rs.getColumnValue(44));
+		emp.setPersonType(rs.getColumnValue(45));
 		
-		emp.setSubPersonType(rs.getColumnValue(45));
-		emp.setSobName(rs.getColumnValue(46));
-		emp.setTCSExp(rs.getColumnValue(47));
-		emp.setTotalExp(rs.getColumnValue(48));
-		emp.setAllocationStartDate(rs.getColumnValue(49));
-		emp.setAllocationEndDate(rs.getColumnValue(50));
-		emp.setPercentageAllocation(rs.getColumnValue(51));
-		emp.setEmployeeCluster(rs.getColumnValue(52));
-		emp.setParentIOU(rs.getColumnValue(53));
-		emp.setChildIOU(rs.getColumnValue(54));
-		emp.setTeamRole(rs.getColumnValue(55));	
+		emp.setSubPersonType(rs.getColumnValue(46));
+		emp.setSobName(rs.getColumnValue(47));
+		emp.setTCSExp(rs.getColumnValue(48));
+		emp.setTotalExp(rs.getColumnValue(49));
+		emp.setAllocationStartDate(rs.getColumnValue(50));
+		emp.setAllocationEndDate(rs.getColumnValue(51));
+		emp.setPercentageAllocation(rs.getColumnValue(52));
+		emp.setEmployeeCluster(rs.getColumnValue(53));
+		emp.setParentIOU(rs.getColumnValue(54));
+		emp.setChildIOU(rs.getColumnValue(55));
+		emp.setTeamRole(rs.getColumnValue(56));	
 		
-		emp.setPlatforms(rs.getColumnValue(56));
-		emp.setDc(rs.getColumnValue(57));
-		emp.setSite(rs.getColumnValue(58));
+		emp.setPlatforms(rs.getColumnValue(57));
+		emp.setDc(rs.getColumnValue(58));
+		emp.setSite(rs.getColumnValue(59));
 		
 		
 		return emp;

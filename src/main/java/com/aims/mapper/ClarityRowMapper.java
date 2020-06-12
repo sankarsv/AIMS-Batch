@@ -5,13 +5,14 @@ import java.util.Map;
 
 import org.springframework.batch.item.excel.RowMapper;
 import org.springframework.batch.item.excel.support.rowset.RowSet;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.aims.bo.ClarityDetails;
 
 public class ClarityRowMapper implements RowMapper<ClarityDetails> {
 
 	private Map<String, String> tempStore = null;
+	
+	private String endOfRecords = "GRAND TOTAL";
 
 	public ClarityRowMapper() {
 		tempStore = new HashMap<String, String>();
@@ -28,7 +29,7 @@ public class ClarityRowMapper implements RowMapper<ClarityDetails> {
 
 		ClarityDetails cd = new ClarityDetails();
 
-		if (rs == null || rs.getCurrentRow() == null) {
+		if (rs == null || rs.getCurrentRow() == null || (endOfRecords.equalsIgnoreCase(rs.getColumnValue(0)))) {
 			return null;
 		}
 

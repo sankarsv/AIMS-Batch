@@ -92,6 +92,18 @@ public class ProcessorHCMasterBuild  implements ItemProcessor<Employee, HCDetail
 		hcd.setPlatform(emp.getPlatforms());
 		hcd.setDc(emp.getDc());
 		hcd.setSite(emp.getSite());
+		
+		/*System.out.println("Value of hcdetails " +hcd.getAllocEnd() + "--" +hcd.getAllocStart() + "--"
+				+ hcd.getAm() + "--" +hcd.getAmID()+ "--" +hcd.getBaseBranch()+ "--" +hcd.getBaseCountry()+ "--" +hcd.getBaseDC()+ "--" +hcd.getBrm()
+				+ "--" +hcd.getBrm1()+ "--" +hcd.getCcInd()+ "--" +hcd.getChildiou()+ "--" +hcd.getClientCountry()+ "--" +hcd.getClientGeography()
+				+ "--" +hcd.getCluster()+ "--" +hcd.getCustomer()+ "--" +hcd.getDc()+ "--" +hcd.getDeputeDC()+ "--" +hcd.getDesignation()+ "--" +hcd.getDeupteBranch()
+				+ "--" +hcd.getDm()+ "--" +hcd.getDoj()+ "--" +hcd.getEmployeecluster()+ "--" +hcd.getEmployeeLocation()+ "--" +hcd.getEmployeetype()+ "--" +hcd.getEmployeeType()
+				+ "--" +hcd.getEmpName()+ "--" +hcd.getEmpNo()+ "--" +hcd.getExperience()+ "--" +hcd.getGl()+ "--" +hcd.getGrade()+ "--" +hcd.getGroupCustomer()+ "--" +hcd.getIou()
+				+ "--" +hcd.getIp()+ "--" +hcd.getMapDesignation()+ "--" +hcd.getParentiou()+ "--" +hcd.getPercAlloc()+ "--" +hcd.getPersonType()+ "--" +hcd.getPl()
+				+ "--" +hcd.getPlatform()+ "--" +hcd.getProjectID()+ "--" +hcd.getProjectLoc()+ "--" +hcd.getProjectName()+ "--" +hcd.getProjectType()+ "--" +hcd.getRm()+ "--" +hcd.getSdbname()
+				+ "--" +hcd.getSeniorjunior()+ "--" +hcd.getSite()+ "--" +hcd.getSnowcategory()+ "--" +hcd.getSp()+ "--" +hcd.getSubiou()+ "--" +hcd.getSubPersonType()+ "--" +hcd.getSubSP()
+				+ "--" +hcd.getTeamrole()+ "--" +hcd.getTotExp()+ "--" +hcd.getTravelCountry()+ "--" +hcd.getTravelType()+ "--" +hcd.getTurnkey()+ "--" +hcd.getWorkCountry()
+				+ "--" +hcd.getWorkGeography()+ "--" +hcd.getWorkLocation()+ "--");*/
 	}
 
 }

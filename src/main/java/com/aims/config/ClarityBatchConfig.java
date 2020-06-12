@@ -101,7 +101,7 @@ public class ClarityBatchConfig {
 		reader.setLinesToSkip(1);
 		reader.setResource(resource);
 
-		reader.setCurrentSheet(7);
+		reader.setCurrentSheet(0);
 
 		return reader;
 	}
