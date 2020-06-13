@@ -72,7 +72,7 @@ public class BatchDao {
 	
 	private static String retrieveBrmEmpId= "SELECT brm_empid FROM aims.portfolio WHERE brmname = ? limit 1";
 	
-	private static String retrieveDmId= "SELECT dm_emp_id FROM aims.portfolio WHERE dm_name = ?";
+	private static String retrieveDmId= "SELECT dm_emp_id FROM aims.portfolio WHERE dm_name = ? limit 1";
 	
 	private static String retrieveclarityVersSql= "SELECT distinct clarityversion from aims.billingversion where periodmonth=? and year=?";
 	

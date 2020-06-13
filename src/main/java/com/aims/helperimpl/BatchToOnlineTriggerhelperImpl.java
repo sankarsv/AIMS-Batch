@@ -200,7 +200,7 @@ public class BatchToOnlineTriggerhelperImpl implements BatchToOnlineTriggerhelpe
 				// employee.setJoiningDate(tempHCDtl.getDoj()); - Type conversion issue
 				// employee.setPreviousExperience(tempHCDtl.);
 				// employee.setTotalExperience(tempHCDtl.getTotExp()); - Type conversion issue
-				Integer brmId = getDao().retrievebrmEmpId(tempHCDtl.getBrm());
+				Integer brmId = getDao().retrievebrmEmpId(tempHCDtl.getBrm1());
 				employee.setBrm(brmId.toString());
 				// employee.setEm(tempHCDtl.);
 				

@@ -33,7 +33,7 @@ public class BillingRowMapper implements RowMapper<BillingDetails> {
 
 		LocalDate currentDate = LocalDate.now();
 
-		details.setBillMonth(currentDate.getMonth().toString());
+		details.setBillMonth(currentDate.minusMonths(1).toString());
 		details.setBillYear(currentDate.getYear());
 
 		return details;
