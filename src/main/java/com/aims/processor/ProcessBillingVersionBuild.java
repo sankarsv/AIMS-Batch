@@ -18,13 +18,14 @@ public class ProcessBillingVersionBuild implements ItemProcessor<BillingDetails,
 	@Override
 	public BillingVersion process(BillingDetails details) throws Exception {
 		// TODO Auto-generated method stub
-
-		BillingVersion vers = new BillingVersion();		
+		BillingVersion vers = new BillingVersion();	
+		if(details.getBrm()!=null) {			
 
 		mapBillingVersion(details, vers);
 
 		if (!(dao.checkBillingVersionExist(vers))) {
 			dao.insertBillingVersion(vers);
+		}
 		}
 
 		return vers;

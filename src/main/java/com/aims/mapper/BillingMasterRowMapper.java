@@ -12,9 +12,11 @@ public class BillingMasterRowMapper implements RowMapper<BillingDetails> {
 		
 		
 		if (rs == null || rs.getCurrentRow() == null || !rs.getMetaData().getSheetName().equalsIgnoreCase("Sheet1")
-				|| rs.getColumnValue(0)=="") {
+				) {
 			return null;
 		}
+		if( rs.getColumnValue(0)=="")
+			return new BillingDetails();
 		
 		BillingDetails details = new BillingDetails();
 		details.setBrm(rs.getColumnValue(0));

@@ -22,9 +22,10 @@ public class ProcessBillingMasterBuild implements ItemProcessor<BillingDetails, 
 	@Override
 	public BillingMaster process(BillingDetails details) throws Exception {
 		// TODO Auto-generated method stub
-
+		
 		BillingMaster mas = new BillingMaster();
 		
+		if(details.getBrm()!=null) {
 		Integer brmEmpId = dao.retrievebrmEmpId(details.getBrm());
 		
 		int billingVersion = dao.retrieveBillingVersion(details,brmEmpId.toString());
@@ -43,6 +44,7 @@ public class ProcessBillingMasterBuild implements ItemProcessor<BillingDetails, 
 		if (dao.upDateBillRate(holder, details) == 0) {
 
 			dao.insertBillRate(holder, details, billingVersion);
+		}
 		}
 
 		return mas;
