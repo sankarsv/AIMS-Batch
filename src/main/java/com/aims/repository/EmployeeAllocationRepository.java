@@ -14,7 +14,7 @@ import com.aims.model.EmployeeAllocation;
 @Repository
 public interface EmployeeAllocationRepository<E> extends JpaRepository<EmployeeAllocation, AllocationPk> {
 	
-	@Query("SELECT u FROM EmployeeAllocation u WHERE u.allocation_pk.employeeId = :employeeId")
+	@Query("SELECT u FROM EmployeeAllocation u WHERE employeeId = :employeeId")
     List<EmployeeAllocation> findByEmployeeId(@Param("employeeId") Integer employeeId);
 	
 	

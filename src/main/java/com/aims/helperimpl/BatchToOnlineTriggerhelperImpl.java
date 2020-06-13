@@ -86,7 +86,7 @@ public class BatchToOnlineTriggerhelperImpl implements BatchToOnlineTriggerhelpe
 
 				for (EmployeeAllocation employeeAllocationDB : empAllocationPresentList) {
 
-					dbEmployeeAllocationExistList.add(employeeAllocationDB.getAllocationNew_pk().getEmployeeId());
+					dbEmployeeAllocationExistList.add(employeeAllocationDB.getEmployeeId());
 
 				}
 
@@ -285,20 +285,21 @@ public class BatchToOnlineTriggerhelperImpl implements BatchToOnlineTriggerhelpe
 				// Allocation Bean preparation
 				EmployeeAllocation empAllocation = new EmployeeAllocation();
 				AllocationPk allocationNewPk = new AllocationPk();
+				//allocationNewPk.setAllocationId(0);
 				System.out
 						.println("***Printing empAllocation - EmpNo ***" + tempHCDtl.getEmpNo());
-				allocationNewPk.setEmployeeId(tempHCDtl.getEmpNo());
-				allocationNewPk.setProjectId(project_id);
+				empAllocation.setEmployeeId(tempHCDtl.getEmpNo());
+				empAllocation.setProjectId(project_id);
 				DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("d-MMM-yy");
 
 				if (tempHCDtl.getAllocStart() != null) {
 					System.out.println("Printing allocation start Date -->" + tempHCDtl.getAllocStart());
 					String allocationStdate = tempHCDtl.getAllocStart();
-					allocationNewPk.setStartDate(LocalDate.parse(allocationStdate, formatter2));
+					empAllocation.setStartDate(LocalDate.parse(allocationStdate, formatter2));
 
 				}
 
-				empAllocation.setAllocationNew_pk(allocationNewPk);
+				//empAllocation.setAllocationNew_pk(allocationNewPk);
 
 				empAllocation.setWonId(project_id);
 
@@ -310,7 +311,7 @@ public class BatchToOnlineTriggerhelperImpl implements BatchToOnlineTriggerhelpe
 				if (tempHCDtl.getAllocStart() != null) {
 					System.out.println("Printing allocation start Date -->" + tempHCDtl.getAllocStart());
 					String allocationStdate = tempHCDtl.getAllocStart();
-					empAllocation.getAllocationNew_pk().setStartDate(LocalDate.parse(allocationStdate, formatter2));
+					empAllocation.setStartDate(LocalDate.parse(allocationStdate, formatter2));
 					// empAllocation.setStartDate(LocalDate.parse(allocationStdate, formatter2));
 				}
 

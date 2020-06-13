@@ -26,8 +26,15 @@ public class EmployeeAllocation implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	@EmbeddedId
-	private AllocationPk allocation_pk;
+	/*
+	 * @EmbeddedId private AllocationPk allocation_pk;
+	 */
+	
+	@Id
+	@Column(name = "allocation_id", nullable = false)
+	@SequenceGenerator(name="allocation_id",sequenceName="seq_allocation_id",schema = "aims", initialValue=1, allocationSize=100)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="allocation_id")
+	private int allocationId;
 
 	/*
 	 * @Column(name = "employee_id") private int employeeId;
@@ -39,6 +46,16 @@ public class EmployeeAllocation implements Serializable {
 
 	@Column(name = "won_id")
 	private int wonId;
+	
+	@Column(name = "employee_id", nullable = false)
+	private int employeeId;
+
+	@Column(name = "project_id", nullable = false)
+	private int projectId;
+
+	@Column(name = "start_date", nullable = false)
+	private LocalDate startDate;
+
 
 	@Column(name = "project_change_date")
 	private LocalDate projectChangeDate;
@@ -107,29 +124,26 @@ public class EmployeeAllocation implements Serializable {
 		return serialVersionUID;
 	}
 
-	public AllocationPk getAllocationNew_pk() {
-		return allocation_pk;
-	}
+	
 
-	public void setAllocationNew_pk(AllocationPk allocationNew_pk) {
-		this.allocation_pk = allocationNew_pk;
-	}
-
-	public EmployeeAllocation(AllocationPk allocationNew_pk, int wonId, LocalDate projectChangeDate, int portfolioId,
-			LocalDate endDate, String travelType, float percentageAllocation) {
+	public EmployeeAllocation(int allocationId, int wonId, LocalDate projectChangeDate, int portfolioId,
+			LocalDate endDate, String travelType, float percentageAllocation, int employeeId, LocalDate startDate, int projectId) {
 		super();
-		this.allocation_pk = allocationNew_pk;
+		this.allocationId = allocationId;
 		this.wonId = wonId;
 		this.projectChangeDate = projectChangeDate;
 		this.portfolioId = portfolioId;
 		this.endDate = endDate;
 		this.travelType = travelType;
 		this.percentageAllocation = percentageAllocation;
+		this.employeeId = employeeId;
+		this.projectId= projectId;
+		this.startDate=startDate;
 	}
 
 	@Override
 	public String toString() {
-		return "EmployeeAllocation [allocationNew_pk=" + allocation_pk + ", wonId=" + wonId + ", projectChangeDate="
+		return "EmployeeAllocation [allocationNew_pk=" + allocationId + ", wonId=" + wonId + ", projectChangeDate="
 				+ projectChangeDate + ", portfolioId=" + portfolioId + ", endDate=" + endDate + ", travelType="
 				+ travelType + ", percentageAllocation=" + percentageAllocation + "]";
 	}
@@ -137,6 +151,29 @@ public class EmployeeAllocation implements Serializable {
 	public EmployeeAllocation() {
 		super();
 		// TODO Auto-generated constructor stub
+	}
+	public int getEmployeeId() {
+		return employeeId;
+	}
+
+	public void setEmployeeId(int employeeId) {
+		this.employeeId = employeeId;
+	}
+
+	public int getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(int projectId) {
+		this.projectId = projectId;
+	}
+
+	public LocalDate getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(LocalDate startDate) {
+		this.startDate = startDate;
 	}
 
 	
