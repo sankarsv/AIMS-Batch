@@ -35,9 +35,6 @@ public class Project implements Serializable {
 	@NotNull
 	private LocalDate projectChangeDate;
 
-	@Column(name = "work_geogrphy")
-	private String workGeogrphy;
-
 	@Column(name = "work_country")
 	private String workCountry;
 
@@ -159,14 +156,7 @@ public class Project implements Serializable {
 		this.projectChangeDate = projectChangeDate;
 	}
 
-	public String getWorkGeogrphy() {
-		return workGeogrphy;
-	}
-
-	public void setWorkGeogrphy(String workGeogrphy) {
-		this.workGeogrphy = workGeogrphy;
-	}
-
+	
 	public String getWorkCountry() {
 		return workCountry;
 	}
@@ -406,7 +396,7 @@ public class Project implements Serializable {
 	@Override
 	public String toString() {
 		return "Project [projectId=" + projectId + ", projectName=" + projectName + ", projectLocation="
-				+ projectLocation + ", projectChangeDate=" + projectChangeDate + ", workGeogrphy=" + workGeogrphy
+				+ projectLocation + ", projectChangeDate=" + projectChangeDate + ", workGeogrphy=" 
 				+ ", workCountry=" + workCountry + ", workLocation=" + workLocation + ", clientGeography="
 				+ clientGeography + ", clientCountry=" + clientCountry + ", ip=" + ip + ", sp=" + sp + ", subsp="
 				+ subsp + ", brm=" + brm + ", gl=" + gl + ", amid=" + amid + ", am=" + am + ", pl=" + pl

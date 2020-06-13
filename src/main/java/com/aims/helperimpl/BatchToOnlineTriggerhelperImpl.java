@@ -248,7 +248,6 @@ public class BatchToOnlineTriggerhelperImpl implements BatchToOnlineTriggerhelpe
 				LocalDate today = LocalDate.now();
 				System.out.println(formatter.format(today));
 				project.setProjectChangeDate(today); // Need to revist
-				project.setWorkGeogrphy(tempHCDtl.getWorkGeography());
 				project.setWorkCountry(tempHCDtl.getWorkCountry());
 				project.setWorkLocation(tempHCDtl.getWorkLocation());
 				project.setClientGeography(tempHCDtl.getClientGeography());
