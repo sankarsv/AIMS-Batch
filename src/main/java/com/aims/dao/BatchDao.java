@@ -70,7 +70,7 @@ public class BatchDao {
 	
 	private static String sretrieveSql = "SELECT version_no FROM aims.hcversion WHERE current_ind = ?";
 	
-	private static String retrieveBrmEmpId= "SELECT brm_empid FROM aims.portfolio WHERE brmname = ?";
+	private static String retrieveBrmEmpId= "SELECT brm_empid FROM aims.portfolio WHERE brmname = ? limit 1";
 	
 	private static String retrieveDmId= "SELECT dm_emp_id FROM aims.portfolio WHERE dm_name = ?";
 	
