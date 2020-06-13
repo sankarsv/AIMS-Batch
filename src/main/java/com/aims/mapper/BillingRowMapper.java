@@ -20,7 +20,8 @@ public class BillingRowMapper implements RowMapper<BillingDetails> {
 
 		if (rs == null || rs.getCurrentRow() == null 
 				
-				|| (rs.getMetaData().getSheetName()!=null && !rs.getMetaData().getSheetName().equalsIgnoreCase("Sheet1"))) {
+				|| (rs.getMetaData().getSheetName()!=null && !rs.getMetaData().getSheetName().equalsIgnoreCase("Sheet1"))
+				|| rs.getColumnValue(0)==null) {
 			return null;
 		}
 
