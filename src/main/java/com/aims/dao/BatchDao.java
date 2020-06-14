@@ -109,7 +109,7 @@ public class BatchDao {
 				.addValue("year", year);
 		
 		int value=myJDBC.update(clarityVersionUpdateSql, parameters, holder);		
-		//, new Object[] {month,year});
+		//, new Object[] {month,year}); 
 		System.out.println("update count of carity version" +value);
 	}
 	
@@ -218,7 +218,7 @@ public class BatchDao {
 	{
 		LocalDate currentDate = LocalDate.now();
 
-		String month =currentDate.getMonth().toString();
+		String month =currentDate.minusMonths(1).getMonth().toString();
 		int year = currentDate.getYear();
 		return (Integer) jdbcTemplate.queryForObject(retrieveBillingVersionSql,new Object[] {brmEmpId,month,year,bd.getOnsiteOffshore()},Integer.class);
 	}

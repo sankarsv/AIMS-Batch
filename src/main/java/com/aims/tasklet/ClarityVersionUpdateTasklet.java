@@ -25,7 +25,7 @@ public class ClarityVersionUpdateTasklet implements Tasklet {
 		try {
 			if (dao.getClarityInter() != null) {
 				LocalDate currentDate = LocalDate.now();
-				String month = currentDate.getMonth().toString();
+				String month = currentDate.minusMonths(1).getMonth().toString();
 				int year = currentDate.getYear();
 				KeyHolder holder = new GeneratedKeyHolder();
 				dao.updateClarityVersion(holder, month, year);

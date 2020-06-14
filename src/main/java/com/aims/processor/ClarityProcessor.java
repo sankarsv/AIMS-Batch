@@ -25,7 +25,7 @@ public class ClarityProcessor implements ItemProcessor<ClarityDetails, ClarityMa
 
 		ClarityMaster cm = new ClarityMaster();
 		LocalDate currentDate = LocalDate.now();
-		String month = currentDate.getMonth().toString();
+		String month = currentDate.minusMonths(1).getMonth().toString();
 		int year = currentDate.getYear();
 
 		clarityVersion = dao.retrieveclarityVersion(month, year);
