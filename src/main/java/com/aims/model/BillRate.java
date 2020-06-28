@@ -18,11 +18,11 @@ public class BillRate  implements Serializable{
 	 */
 	private static final long serialVersionUID = 7536774219345394015L;
 	@Id
-	@Column(name="billing_employee_id")	
+	@Column(name="employee_id")	
 	private String empId;
 	
 	@Id
-	@Column(name="billing_version")	
+	@Column(name="version")	
 	private int version;
 	
 	@Column(name="billrate")	
