@@ -27,6 +27,9 @@ public class BillingMaster implements Serializable {
 	@Column(name = "DMNAME")
 	private String dmName;
 	
+	@Column(name = "PROJECTNAME")
+	private String projectName;
+	
 	/*@Column(name="BRMNAME")
 	private String brmName;
 	
@@ -179,6 +182,14 @@ public class BillingMaster implements Serializable {
 
 	public void setRemarks2(String remarks2) {
 		this.remarks2 = remarks2;
+	}
+
+	public String getProjectName() {
+		return projectName;
+	}
+
+	public void setProjectName(String projectName) {
+		this.projectName = projectName;
 	}
 
 	/*public String getBrmName() {

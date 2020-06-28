@@ -55,7 +55,7 @@ public class BatchDao {
 	//brmname=:brmname,officeid=:officeid,employee_name=:empname
 	private static String sqlBillMasterUpdate ="UPDATE aims.billingmaster set dmname = :dmname, won= :won, onsite_offshore=:onof, sto=:sto, billablehours=:billablehours,"
 			+ " billabledays=:billabledays, effort=:effort, extrahours=:extrahours, extrabilling=:extrabilling, billableamount=:billableamount,"
-			+ " remarks1=:remarks1,remarks2=:remarks2 where employee_id = :empid and version=:version";
+			+ " remarks1=:remarks1,remarks2=:remarks2,projectname=:projectName where employee_id = :empid and version=:version";
 	
 	private static String sqlBillRateInsert ="INSERT INTO aims.billrate(billing_employee_id, billrate, currencr, enddate, startdate, billing_version) "
 			+ "VALUES (:empid, :billrate, :currency, :enddate, :startdate, :version)";
@@ -64,8 +64,8 @@ public class BatchDao {
 			+ "VALUES (nextval('aims.seq_clarity_id'), :version, :transactionclass, :cccio, :resourcemanager, :timesheetdepartment, :lastnamefirstname, :resourceid, :officeid, :cin, :sumofhours, :averagerate, :ratewithouttax)";
 	
 	private static String sqlBillMasterInsert ="INSERT INTO aims.billingmaster(version, employee_id, dmname, won, onsite_offshore, sto, billablehours, billabledays, effort, extrahours, "
-			+ "extrabilling, billableamount, remarks1, remarks2) "
-			+ "VALUES (:version, :empid, :dmname, :won, :onsiteoffshore, :sto, :billablehrs, :billabledays, :effort, :extrahours, :extrabilling, :billableamount, :remarks1, :remarks2)";
+			+ "extrabilling, billableamount, remarks1, remarks2, projectname) "
+			+ "VALUES (:version, :empid, :dmname, :won, :onsiteoffshore, :sto, :billablehrs, :billabledays, :effort, :extrahours, :extrabilling, :billableamount, :remarks1, :remarks2, :projectName)";
 			
 	
 	private static String sretrieveSql = "SELECT version_no FROM aims.hcversion WHERE current_ind = ?";
@@ -253,7 +253,8 @@ public class BatchDao {
 				.addValue("billablehours", bd.getBillablehrs()).addValue("billabledays", bd.getBillableDays())
 				.addValue("effort", bd.getEffort()).addValue("extrahours", bd.getExtraHours()).addValue("extrabilling", bd.getExtraBilling())
 				.addValue("billableamount", bd.getBillableAmount()).addValue("remarks1", bd.getRemarks1())
-				.addValue("remarks2", bd.getRemarks2()).addValue("empid", bd.getEmpId()).addValue("version", bd.getVersionNo());
+				.addValue("remarks2", bd.getRemarks2()).addValue("empid", bd.getEmpId()).addValue("version", bd.getVersionNo())
+				.addValue("projectName", bd.getProjectName());
 		
 		//.addValue("brmname", bd.getBrmName()).addValue("officeid", bd.getOfficeId()).addValue("empname", bd.getEmpName())
 		return myJDBC.update(sqlBillMasterUpdate, parameters, holder);
@@ -277,7 +278,7 @@ public class BatchDao {
 				.addValue("billablehrs", bd.getBillablehrs()).addValue("billabledays", bd.getBillableDays())
 				.addValue("effort", bd.getEffort()).addValue("extrahours", bd.getExtraHours()).addValue("extrabilling", bd.getExtraBilling())
 				.addValue("billableamount", bd.getBillableAmount()).addValue("remarks1", bd.getRemarks1())
-				.addValue("remarks2", bd.getRemarks2());
+				.addValue("remarks2", bd.getRemarks2()).addValue("projectName", bd.getProjectName());;
 		//.addValue("brm", bd.getBrmName()).addValue("officeid", bd.getOfficeId()).addValue("empname", bd.getEmpName());
 		myJDBC.update(sqlBillMasterInsert, parameters, holder);
 	}

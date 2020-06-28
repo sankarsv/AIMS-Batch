@@ -55,6 +55,7 @@ public class ProcessBillingMasterBuild implements ItemProcessor<BillingDetails, 
 		
 		bm.setVersionNo(billingVersion);
 		bm.setEmpId(bd.getEmpId());
+		bm.setProjectName(bd.getProjectName());
 		bm.setDmName(bd.getDmName());
 		bm.setOnsiteOffshore(bd.getOnsiteOffshore());
 		bm.setWonNumber(bd.getWonNumber());
