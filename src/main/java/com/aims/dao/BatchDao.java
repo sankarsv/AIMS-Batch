@@ -50,14 +50,14 @@ public class BatchDao {
 	private static String sqlBillingVersionWrite = "INSERT INTO aims.billingversion (brm_empno, periodmonth, year, version, freezeind, location)"
 			+ "	VALUES (:brm_empno, :month, :year, nextval('aims.seq_bill_version'), :freeze, :location)";
 	
-	private String sqlBillRateUpdate ="UPDATE aims.billrate set billrate = :billrate where billing_employee_id = :empid";
+	private String sqlBillRateUpdate ="UPDATE aims.billrate set billrate = :billrate where employee_id = :empid";
 	
 	//brmname=:brmname,officeid=:officeid,employee_name=:empname
 	private static String sqlBillMasterUpdate ="UPDATE aims.billingmaster set dmname = :dmname, won= :won, onsite_offshore=:onof, sto=:sto, billablehours=:billablehours,"
 			+ " billabledays=:billabledays, effort=:effort, extrahours=:extrahours, extrabilling=:extrabilling, billableamount=:billableamount,"
 			+ " remarks1=:remarks1,remarks2=:remarks2,projectname=:projectName where employee_id = :empid and version=:version";
 	
-	private static String sqlBillRateInsert ="INSERT INTO aims.billrate(billing_employee_id, billrate, currencr, enddate, startdate, billing_version) "
+	private static String sqlBillRateInsert ="INSERT INTO aims.billrate(employee_id, billrate, currencr, enddate, startdate, version) "
 			+ "VALUES (:empid, :billrate, :currency, :enddate, :startdate, :version)";
 	
 	private static String sqlClarityMasterInsert ="INSERT INTO aims.claritymaster(clarity_id, version, transactionclass, cccio, resourcemanager, timesheetdepartment, lastnamefirstname, resourceid, officeid, cin, sumofhours, averagerate, ratewithouttax) "
