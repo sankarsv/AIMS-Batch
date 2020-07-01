@@ -58,13 +58,13 @@ public class ClarityRowMapper implements RowMapper<ClarityDetails> {
 			tempStore.put("timesheet_dept", rs.getColumnValue(3));
 		}
 		if (rs.getColumnValue(4) == null || rs.getColumnValue(4)=="") {
-			cd.setFullName(tempStore.get("fullname"));
+			cd.setFullName("");
 		} else {
 			cd.setFullName(rs.getColumnValue(4));
 			tempStore.put("fullname", rs.getColumnValue(4));
 		}
 		if (rs.getColumnValue(5) == null || rs.getColumnValue(5)=="") {
-			cd.setResourceId(tempStore.get("resourceId"));
+			cd.setResourceId("");
 		} else {
 			cd.setResourceId(rs.getColumnValue(5));
 			tempStore.put("resourceId", rs.getColumnValue(5));
