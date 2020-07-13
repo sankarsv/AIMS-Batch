@@ -76,7 +76,7 @@ public class BatchDao {
 	
 	private static String retrieveclarityVersSql= "SELECT distinct clarityversion from aims.billingversion where periodmonth=? and year=?";
 	
-	private static String checkIfbillingVersionSql = "SELECT version FROM aims.billingversion WHERE brm_empno = ? and year =? and periodmonth=? and location=?";
+	private static String checkIfbillingVersionSql = "SELECT version FROM aims.billingversion WHERE brm_empno = ? and year =? and periodmonth=?";
 	
 	private static String retrieveBillingVersionSql = "select version from aims.billingversion WHERE brm_empno = ? and periodmonth=? and year =? and location=?";
 	
@@ -172,7 +172,7 @@ public class BatchDao {
 	public boolean checkBillingVersionExist(BillingVersion bv) {
 		try {
 			jdbcTemplate.queryForObject(checkIfbillingVersionSql,
-					new Object[] { bv.getBrmEmpNo(), bv.getYear(), bv.getMonth(), bv.getLocation() }, Integer.class);
+					new Object[] { bv.getBrmEmpNo(), bv.getYear(), bv.getMonth() }, Integer.class);
 		} catch (EmptyResultDataAccessException ex) {
 			return false;
 		}
